@@ -1,0 +1,58 @@
+﻿<div class="container">
+	<ErrorSvg />
+	<h1>Ой! У вас не достаточно прав доступа. Ошибка 403!</h1>
+	<p>Похоже, вы заблудились в космосе. Давайте вернем вас на главную страницу.</p>
+	<a href="/" class="home-button">Вернуться на главную</a>
+</div>
+<style>
+	body {
+		margin: 0;
+		padding: 0;
+		font-family: 'Arial', sans-serif;
+		background: linear-gradient(135deg, #FFF 0%, #99F 100%);
+		color: #000;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		height: 100vh;
+		text-align: center;
+	}
+
+	.container {
+		max-width: 600px;
+		padding: 20px;
+	}
+
+	.illustration img {
+		width: 100%;
+		max-width: 300px;
+		height: auto;
+		margin-bottom: 20px;
+	}
+
+	h1 {
+		font-size: 2.5rem;
+		margin-bottom: 10px;
+	}
+
+	p {
+		font-size: 1.2rem;
+		margin-bottom: 20px;
+	}
+
+	.home-button {
+		display: inline-block;
+		padding: 10px 20px;
+		font-size: 1rem;
+		color: #fff;
+		background-color: #67C;
+		border-radius: 5px;
+		text-decoration: none;
+		transition: background-color 0.5s ease;
+	}
+
+		.home-button:hover {
+			color: #fff;
+			background-color: #349;
+		}
+</style>

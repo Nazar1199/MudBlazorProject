@@ -1,0 +1,75 @@
+﻿@using BlazorAppNet8.Components
+@using BlazorAppNet8.Classes
+@using MudBlazor.Services
+@implements IBrowserViewportObserver
+@implements IAsyncDisposable
+
+<MudCard Align="center" Class="ma-2">
+    <MudCardContent>
+        <MudStack Row="@(_width > 960)">
+            <div>
+                <MudAvatar Size="Size.Large" Color="Color.Primary">
+                    @if (string.IsNullOrEmpty(user.AvatarURL))
+                    {
+                        @(CommonClasses.getFirstChar(@user.FirstName))
+                    }
+                    else
+                    {
+                        <MudImage Src="@(user.AvatarURL)" />
+                    }
+                </MudAvatar>
+            </div>
+            <div>
+                <MudText Align="@(_width > 960? Align.Left : Align.Center)" Typo="Typo.h5">
+                    @(CommonClasses.getFullName(user))
+                </MudText>
+                <MudTextField Class="UserDataItem" @bind-Value="@user.Login" Label="Логин" ReadOnly="readOnly" Variant="@itemVariant" />
+                <MudTextField Class="UserDataItem" @bind-Value="@user.Email" Label="Email" ReadOnly="readOnly" Variant="@itemVariant" />
+                <MudTextField Class="UserDataItem" @bind-Value="@user.Phone" Label="Телефон" ReadOnly="readOnly" Variant="@itemVariant" />
+            </div>
+        </MudStack>
+    </MudCardContent>
+</MudCard>
+
+@code {
+    private bool t { get; set; } = false;
+    Variant itemVariant = Variant.Text;
+    bool readOnly = true;
+    [Parameter]
+    public User user { get; set; } = new User(0);
+
+
+    [Inject]
+    private IBrowserViewportService BrowserViewportService { get; set; }
+
+    private int _width = 0;
+    private int _height = 0;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await BrowserViewportService.SubscribeAsync(this, fireImmediately: true);
+        }
+
+        await base.OnAfterRenderAsync(firstRender);
+    }
+
+    public async ValueTask DisposeAsync() => await BrowserViewportService.UnsubscribeAsync(this);
+
+    Guid IBrowserViewportObserver.Id { get; } = Guid.NewGuid();
+
+    ResizeOptions IBrowserViewportObserver.ResizeOptions { get; } = new()
+        {
+            ReportRate = 50,
+            NotifyOnBreakpointOnly = false
+        };
+
+    Task IBrowserViewportObserver.NotifyBrowserViewportChangeAsync(BrowserViewportEventArgs browserViewportEventArgs)
+    {
+        _width = browserViewportEventArgs.BrowserWindowSize.Width;
+        _height = browserViewportEventArgs.BrowserWindowSize.Height;
+
+        return InvokeAsync(StateHasChanged);
+    }
+}

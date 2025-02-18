@@ -1,0 +1,102 @@
+﻿<div class="container @ThemeClass">
+	<div class="illustration">
+		<ErrorSvg Color="@ThemeColor" DarkTheme="@DarkTheme"/>
+	</div>
+	<h1>Ой! Страница не найдена. Ошибка 404!</h1>
+	<p>Похоже, вы заблудились в космосе. Давайте вернем вас на главную страницу.</p>
+	<a href="/" class="home-button">Вернуться на главную</a>
+</div>
+@code {
+	[Parameter]
+	public string ThemeColor { get; set; } = "#d78203";
+	[Parameter]
+	public bool DarkTheme { get; set; } = true;
+	private string DarkColor => "#1e1e1e";
+	private string LightColor => "#e1e1e1";
+	private string TextColor => DarkTheme ? LightColor : DarkColor;
+	private string BackgroundColor => DarkTheme ? DarkColor : LightColor;
+	private string ThemeClass => DarkTheme ? "dark-theme" : "light-theme";
+
+	protected override void OnInitialized()
+	{
+		base.OnInitialized();
+		string backgroundColor = DarkTheme ? "#1e1e1e" : "#e1e1e1";
+		string textColor = DarkTheme ? "#e1e1e1" : "#1e1e1e";
+		var style = $"--prime-color-base: {ThemeColor}; --background-color: {backgroundColor}; --text-color: {textColor};"; 
+		this.StateHasChanged();
+	}
+
+	protected override void OnParametersSet()
+	{
+		base.OnParametersSet();
+		string backgroundColor = DarkTheme ? "#1e1e1e" : "#e1e1e1";
+		string textColor = DarkTheme ? "#e1e1e1" : "#1e1e1e";
+		var style = $"--prime-color-base: {ThemeColor}; --background-color: {backgroundColor}; --text-color: {textColor};";
+		this.StateHasChanged();
+	}
+}
+<style>
+	:root {
+        --prime-color-base: @ThemeColor;
+		--text-color: @TextColor;
+		--background-color: @BackgroundColor;
+	}
+
+	.dark-theme {
+        --prime-color: var(--prime-color-base);
+        --text-color: #e1e1e1;
+        --background-color: #1e1e1e;
+	}
+
+	.light-theme {
+		--prime-color: var(--prime-color-base);
+		--text-color: #1e1e1e;
+		--background-color: #e1e1e1;
+	}
+
+	body {
+		color: var(--text-color);
+		background-color: var(--background-color);
+		margin: 0;
+		padding: 0;
+		font-family: 'Arial', sans-serif;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		height: 100vh;
+		text-align: center;
+	}
+
+	.container {
+		max-width: 600px;
+		padding: 20px;
+	}
+
+	.illustration img {
+		width: 100%;
+		max-width: 300px;
+		height: auto;
+		margin-bottom: 20px;
+	}
+
+	h1 {
+		font-size: 2.5rem;
+		margin-bottom: 10px;
+	}
+
+	p {
+		font-size: 1.2rem;
+		margin-bottom: 20px;
+	}
+
+	.home-button {
+		display: inline-block;
+		padding: 10px 20px;
+		font-size: 1rem;
+		color: #fff;
+		background-color: @ThemeColor;
+		border-radius: 5px;
+		text-decoration: none;
+		transition: background-color 0.5s ease;
+	}
+</style> 

@@ -1,0 +1,93 @@
+﻿@namespace BlazorAppNet8.Components
+@page "/personal-cabinet"
+
+<h3>Личный кабинет</h3>
+<!--PC version>
+<MudHidden Breakpoint="Breakpoint.SmAndDown">
+    <div style="display: flex; flex-direction: row; flex-wrap: nowrap; justify-content: center;">
+        <div style="display: flex; flex-direction: column; flex-wrap: wrap; justify-content: flex-start; min-width: 350px;">
+            <UserCard user=@currentUser />
+
+            <MudCard Class="ma-2">
+                <MudCardHeader><h6>Первая колонка</h6></MudCardHeader>
+                <MudCardContent>
+                  Правая и левая колонки раздельные в ПК режиме, и в мобильном режиме контект объединяется в одну колонку, используется две разные разметки
+                </MudCardContent>
+            </MudCard>
+        </div>
+        <div style="display: flex; flex-direction: column; flex-wrap: wrap; justify-content: flex-start;">
+            <MudCard Class="ma-2">
+                <MudCardHeader><h6>Карточка 1</h6></MudCardHeader>
+                <MudCardContent>
+                    Пурпурные мысли тихо скользят вдоль изумрудных холмов, где невидимые сущности играют в загадочные игры. Ветер шепчет несуществующие слова, которые только ветер и понимает. Сквозь густую завесу тумана пробиваются лучи света, но они не освещают ничего, кроме пустоты. В этом мире нет ни начала, ни конца – лишь бесконечное переплетение бессмысленных событий и образов.
+                </MudCardContent>
+            </MudCard>
+            <MudCard Class="ma-2">
+                <MudCardHeader><h6>Карточка 2</h6></MudCardHeader>
+                <MudCardContent>
+                    Пурпурные мысли тихо скользят вдоль изумрудных холмов, где невидимые сущности играют в загадочные игры. Ветер шепчет несуществующие слова, которые только ветер и понимает. Сквозь густую завесу тумана пробиваются лучи света, но они не освещают ничего, кроме пустоты. В этом мире нет ни начала, ни конца – лишь бесконечное переплетение бессмысленных событий и образов.
+                </MudCardContent>
+            </MudCard>
+            <MudCard Class="ma-2">
+                <MudCardHeader><h6>Карточка 3</h6></MudCardHeader>
+                <MudCardContent>
+                    Пурпурные мысли тихо скользят вдоль изумрудных холмов, где невидимые сущности играют в загадочные игры. Ветер шепчет несуществующие слова, которые только ветер и понимает. Сквозь густую завесу тумана пробиваются лучи света, но они не освещают ничего, кроме пустоты. В этом мире нет ни начала, ни конца – лишь бесконечное переплетение бессмысленных событий и образов.
+                </MudCardContent>
+            </MudCard>
+        </div>
+    </div>
+</MudHidden>
+<!--Mobile version>
+<MudHidden Breakpoint="Breakpoint.MdAndUp">
+    <div style="display: flex; flex-direction: column; flex-wrap: wrap; justify-content: center;">
+        <UserCard user=@currentUser />
+
+            <MudCard Class="ma-2">
+                <MudCardHeader><h6>Первая колонка</h6></MudCardHeader>
+                <MudCardContent>
+                  Правая и левая колонки раздельные в ПК режиме, и в мобильном режиме контект объединяется в одну колонку, используется две разные разметки
+                </MudCardContent>
+            </MudCard>
+            <MudCard Class="ma-2">
+                <MudCardHeader><h6>Карточка 1</h6></MudCardHeader>
+                <MudCardContent>
+                    Пурпурные мысли тихо скользят вдоль изумрудных холмов, где невидимые сущности играют в загадочные игры. Ветер шепчет несуществующие слова, которые только ветер и понимает. Сквозь густую завесу тумана пробиваются лучи света, но они не освещают ничего, кроме пустоты. В этом мире нет ни начала, ни конца – лишь бесконечное переплетение бессмысленных событий и образов.
+                </MudCardContent>
+            </MudCard>
+            <MudCard Class="ma-2">
+                <MudCardHeader><h6>Карточка 2</h6></MudCardHeader>
+                <MudCardContent>
+                    Пурпурные мысли тихо скользят вдоль изумрудных холмов, где невидимые сущности играют в загадочные игры. Ветер шепчет несуществующие слова, которые только ветер и понимает. Сквозь густую завесу тумана пробиваются лучи света, но они не освещают ничего, кроме пустоты. В этом мире нет ни начала, ни конца – лишь бесконечное переплетение бессмысленных событий и образов.
+                </MudCardContent>
+            </MudCard>
+            <MudCard Class="ma-2">
+                <MudCardHeader><h6>Карточка 3</h6></MudCardHeader>
+                <MudCardContent>
+                    Пурпурные мысли тихо скользят вдоль изумрудных холмов, где невидимые сущности играют в загадочные игры. Ветер шепчет несуществующие слова, которые только ветер и понимает. Сквозь густую завесу тумана пробиваются лучи света, но они не освещают ничего, кроме пустоты. В этом мире нет ни начала, ни конца – лишь бесконечное переплетение бессмысленных событий и образов.
+                </MudCardContent>
+            </MudCard>
+    </div>
+</MudHidden>
+@code {
+    protected override void OnInitialized(){
+        currentUser = getSampleUserObject();
+    }
+
+    public User currentUser = new User(0);
+
+    private async Task<User> getCurrentUserAsync(){
+        Task.Delay(3000);
+        return getSampleUserObject();
+    }
+    private User getSampleUserObject(){
+        User sampleUser = new User(1);
+        sampleUser.FirstName = "Иван";
+        sampleUser.LastName = "Иванов";
+        sampleUser.Patronymic = "Иванович";
+        sampleUser.Email = "ivan.ivanov@example.com";
+        sampleUser.Phone = "8123456789";
+        sampleUser.Login = "Ivanushka";
+        @* sampleUser.AvatarURL = "https://randomuser.me/api/portraits/men/71.jpg"; *@
+        return sampleUser;
+    }
+}
