@@ -1,35 +1,26 @@
 ﻿@using BlazorAppNet8.Components
 @using BlazorAppNet8.Classes
 @using MudBlazor.Services
+@inject NavigationManager NavigationManager
 
+<MudThemeProvider @bind-IsDarkMode="@DarkTheme" Theme="_theme" />
 <MudContainer Class="text-center pa-4">
 	<MudImage src="@PicturePath" Class="mb-4" Style="max-width: 100%; height: auto;" />
 	<MudText Typo="Typo.h3" Class="mb-2">Ой! Страница не найдена. Ошибка 404!</MudText>
 	<MudText Typo="Typo.subtitle1" Class="mb-4">Похоже, вы заблудились в космосе. Давайте вернем вас на главную страницу</MudText>
-	<MudButton Href="/" Variant="Variant.Filled" Color="Color.Primary" Class="pa-3" Style="width: 100%; max-width: 300px;">
+	<MudButton onclick="@(() =>  NavigationManager.NavigateTo("/"))" Variant="Variant.Filled" Color="Color.Primary" Class="pa-3" Style="width: 100%; max-width: 300px;">
 		Вернуться на главную
 	</MudButton>
 </MudContainer>
 @code {
-	[Parameter]
-	public bool DarkTheme { get; set; } = true;
-	// [Parameter]
-	public string ThemeColorName { get; set; } = "Blue";
+	private MudTheme _theme = new();
+	public bool DarkTheme;
 	private string ThemeName => DarkTheme ? "Dark" : "Light";
-	private string PicturePath => $"Pictures/Error{@ThemeName}{@ThemeColorName}.png";
-	private string DarkColor => "#1e1e1e";
-	private string LightColor => "#e1e1e1";
-	private string TextColor => DarkTheme ? LightColor : DarkColor;
-	private string BackgroundColor => DarkTheme ? DarkColor : LightColor;
+	private string PicturePath => $"Pictures/Error{@ThemeName}.png";
 }
 <style>
-	:root {
-		--text-color: @TextColor;
-		--background-color: @BackgroundColor;
-	}
 	body {
-		color: var(--text-color);
-		background-color: var(--background-color);
+		background-color: var(--mud-palette-background);
 		margin: 0;
 		padding: 0;
 		display: flex;
@@ -37,38 +28,5 @@
 		align-items: center;
 		height: 100vh;
 		text-align: center;
-	}
-
-	.container {
-		max-width: 600px;
-		padding: 20px;
-	}
-
-	.illustration img {
-		width: 100%;
-		max-width: 300px;
-		height: auto;
-		margin-bottom: 20px;
-	}
-
-	h1 {
-		font-size: 2.5rem;
-		margin-bottom: 10px;
-	}
-
-	p {
-		font-size: 1.2rem;
-		margin-bottom: 20px;
-	}
-
-	.home-button {
-		display: inline-block;
-		padding: 10px 20px;
-		font-size: 1rem;
-		color: #fff;
-		background-color: #0a58ca;
-		border-radius: 5px;
-		text-decoration: none;
-		transition: background-color 0.5s ease;
 	}
 </style> 
