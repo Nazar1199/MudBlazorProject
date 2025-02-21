@@ -1,65 +1,37 @@
-﻿<div class="container @ThemeClass">
-	<div class="illustration">
-		<ErrorSvg Color="@ThemeColor" DarkTheme="@DarkTheme"/>
-	</div>
-	<h1>Ой! Страница не найдена. Ошибка 404!</h1>
-	<p>Похоже, вы заблудились в космосе. Давайте вернем вас на главную страницу.</p>
-	<a href="/" class="home-button">Вернуться на главную</a>
-</div>
+﻿@using BlazorAppNet8.Components
+@using BlazorAppNet8.Classes
+@using MudBlazor.Services
+
+<MudContainer Class="text-center pa-4">
+	<MudImage src="@PicturePath" Class="mb-4" Style="max-width: 100%; height: auto;" />
+	<MudText Typo="Typo.h3" Class="mb-2">Ой! Страница не найдена. Ошибка 404!</MudText>
+	<MudText Typo="Typo.subtitle1" Class="mb-4">Похоже, вы заблудились в космосе. Давайте вернем вас на главную страницу</MudText>
+	<MudButton Href="/" Variant="Variant.Filled" Color="Color.Primary" Class="pa-3" Style="width: 100%; max-width: 300px;">
+		Вернуться на главную
+	</MudButton>
+</MudContainer>
 @code {
 	[Parameter]
-	public string ThemeColor { get; set; } = "#d78203";
-	[Parameter]
 	public bool DarkTheme { get; set; } = true;
+	// [Parameter]
+	public string ThemeColorName { get; set; } = "Blue";
+	private string ThemeName => DarkTheme ? "Dark" : "Light";
+	private string PicturePath => $"Pictures/Error{@ThemeName}{@ThemeColorName}.png";
 	private string DarkColor => "#1e1e1e";
 	private string LightColor => "#e1e1e1";
 	private string TextColor => DarkTheme ? LightColor : DarkColor;
 	private string BackgroundColor => DarkTheme ? DarkColor : LightColor;
-	private string ThemeClass => DarkTheme ? "dark-theme" : "light-theme";
-
-	protected override void OnInitialized()
-	{
-		base.OnInitialized();
-		string backgroundColor = DarkTheme ? DarkColor : LightColor;
-		string textColor = DarkTheme ? LightColor : DarkColor;
-		var style = $"--prime-color-base: {ThemeColor}; --background-color: {backgroundColor}; --text-color: {textColor};"; 
-		this.StateHasChanged();
-	}
-
-	protected override void OnParametersSet()
-	{
-		base.OnParametersSet();
-		string backgroundColor = DarkTheme ? DarkColor : LightColor;
-		string textColor = DarkTheme ? LightColor : DarkColor;
-		var style = $"--prime-color-base: {ThemeColor}; --background-color: {backgroundColor}; --text-color: {textColor};";
-		this.StateHasChanged();
-	}
 }
 <style>
 	:root {
-        --prime-color-base: @ThemeColor;
 		--text-color: @TextColor;
 		--background-color: @BackgroundColor;
 	}
-
-	.dark-theme {
-        --prime-color: var(--prime-color-base);
-		--text-color: @LightColor;
-        --background-color: @DarkColor;
-	}
-
-	.light-theme {
-		--prime-color: var(--prime-color-base);
-		--text-color: @DarkColor
-		--background-color: @LightColor;
-	}
-
 	body {
 		color: var(--text-color);
 		background-color: var(--background-color);
 		margin: 0;
 		padding: 0;
-		font-family: 'Arial', sans-serif;
 		display: flex;
 		justify-content: center;
 		align-items: center;
@@ -94,7 +66,7 @@
 		padding: 10px 20px;
 		font-size: 1rem;
 		color: #fff;
-		background-color: @ThemeColor;
+		background-color: #0a58ca;
 		border-radius: 5px;
 		text-decoration: none;
 		transition: background-color 0.5s ease;

@@ -1,6 +1,5 @@
-﻿<!-- Generator: Adobe Illustrator 27.5.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
-<div class="@ThemeClass">
-	<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+<!-- Generator: Adobe Illustrator 27.5.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
 	viewBox="0 0 3000 2000" style="enable-background:new 0 0 3000 2000;" xml:space="preserve">
 		<rect style="fill:#FFFFFF00;" width="3000" height="2000" />
 	<path style="fill:var(--prime-color);" d="M1031.559,1601.612c-108.754-32.288-213.431-74.261-304.096-132.103
@@ -542,43 +541,3 @@
 			</g>
 		</g>
 	</svg>
-</div>
-@code {
-	[Parameter]
-	public string Color { get; set; } = "#3333FF";
-	public string DarkColor { get; set; } = "#0006";
-	public string LightColor { get; set; } = "#FFF6";
-	[Parameter]
-	public bool DarkTheme { get; set; } = false;
-	private string ThemeClass => DarkTheme ? "dark-theme" : "light-theme";
-
-	protected override void OnParametersSet()
-	{
-		base.OnParametersSet();
-		var style = $"--prime-color-base: {Color};";
-		this.StateHasChanged();
-	}
-}
-<style>
-	.sample {
-		-webkit-mask: url("Pictures/SvgError.svg") --prime-color-base: @Color;
-		mask: url("Pictures/SvgError.svg") --prime-color-base: @Color;
-		mask-image: url("Pictures/SvgError.svg") --prime-color-base: @Color;
-		;
-	}
-	:root {
-		--prime-color-base: @Color;
-	}
-	.dark-theme {
-		--prime-color: @Color;
-		--shadow-color: @DarkColor;
-		--shadow-wthite-color: @LightColor;
-		--shadow-theme-color: @DarkColor;
-    }
-    .light-theme {
-		--prime-color: @Color;
-		--shadow-color: @DarkColor;
-		--shadow-wthite-color: @LightColor;
-		--shadow-theme-color: @LightColor;
-    }
-</style>
