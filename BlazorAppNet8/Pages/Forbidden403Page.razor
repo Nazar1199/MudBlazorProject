@@ -1,16 +1,38 @@
-﻿<div class="container">
-	<ErrorSvg />
-	<h1>Ой! У вас не достаточно прав доступа. Ошибка 403!</h1>
-	<p>Похоже, вы заблудились в космосе. Давайте вернем вас на главную страницу.</p>
-	<a href="/" class="home-button">Вернуться на главную</a>
-</div>
+﻿@using BlazorAppNet8.Components
+@using BlazorAppNet8.Classes
+@using MudBlazor.Services
+
+<MudContainer Class="text-center pa-4">
+	<MudImage src="@PicturePath" Class="mb-4" Style="max-width: 100%; height: auto;" />
+	<MudText Typo="Typo.h3" Class="mb-2">Ой! У вас не достаточно прав доступа. Ошибка 403!</MudText>
+	<MudText Typo="Typo.subtitle1" Class="mb-4">Похоже, вы заблудились в космосе. Давайте вернем вас на главную страницу</MudText>
+	<MudButton Href="/" Variant="Variant.Filled" Color="Color.Primary" Class="pa-3" Style="width: 100%; max-width: 300px;">
+		Вернуться на главную
+	</MudButton>
+</MudContainer>
+@code {
+	[Parameter]
+	public bool DarkTheme { get; set; } = true;
+	// [Parameter]
+	public string ThemeColorName { get; set; } = "Blue";
+	private string ThemeName => DarkTheme ? "Dark" : "Light";
+	private string PicturePath => $"Pictures/Error{@ThemeName}{@ThemeColorName}.png";
+	private string DarkColor => "#1e1e1e";
+	private string LightColor => "#e1e1e1";
+	private string TextColor => DarkTheme ? LightColor : DarkColor;
+	private string BackgroundColor => DarkTheme ? DarkColor : LightColor;
+}
 <style>
+	:root {
+		--text-color: @TextColor;
+		--background-color: @BackgroundColor;
+	}
+
 	body {
+		color: var(--text-color);
+		background-color: var(--background-color);
 		margin: 0;
 		padding: 0;
-		font-family: 'Arial', sans-serif;
-		background: linear-gradient(135deg, #FFF 0%, #99F 100%);
-		color: #000;
 		display: flex;
 		justify-content: center;
 		align-items: center;
@@ -45,14 +67,9 @@
 		padding: 10px 20px;
 		font-size: 1rem;
 		color: #fff;
-		background-color: #67C;
+		background-color: #0a58ca;
 		border-radius: 5px;
 		text-decoration: none;
 		transition: background-color 0.5s ease;
 	}
-
-		.home-button:hover {
-			color: #fff;
-			background-color: #349;
-		}
-</style>
+</style> 
