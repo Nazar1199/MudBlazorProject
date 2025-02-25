@@ -1,0 +1,26 @@
+﻿@page "/icon-item"
+@using MudBlazor
+@using BlazorAppNet8.Components
+@inject NavigationManager NavigationManager
+
+<MudCard onclick="@NavItemClick">
+    <MudCardContent Align="Align.Center" Justify="Justify.Center">
+        <MudIcon Icon="@Icon" Color="@IconColor" Size="@IconSize" />
+        <MudText Align="Align.Center">@Text</MudText>
+    </MudCardContent>
+</MudCard>
+
+@code {
+    private Size IconSize = Size.Large;
+    private string Icon = Icons.Custom.Uncategorized.Radioactive; // Иконка по умолчанию
+    private Color IconColor = Color.Warning; // Цвет иконки по умолчанию
+    private string Text = "Нажми на иконку"; // Текст под иконкой
+    private string HrefToPage = "/";
+
+    private void NavItemClick()
+    {
+        // Меняем цвет иконки при нажатии
+        IconColor = IconColor == Color.Warning ? Color.Error : Color.Warning;
+        // NavigationManager.NavigateTo(HrefToPage);
+    }
+}
