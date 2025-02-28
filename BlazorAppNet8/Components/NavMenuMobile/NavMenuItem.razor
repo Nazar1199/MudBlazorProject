@@ -3,24 +3,30 @@
 @using BlazorAppNet8.Components
 @inject NavigationManager NavigationManager
 
-<MudCard onclick="@NavItemClick">
-    <MudCardContent Align="Align.Center" Justify="Justify.Center">
-        <MudIcon Icon="@Icon" Color="@IconColor" Size="@IconSize" />
-        <MudText Align="Align.Center">@Text</MudText>
+<MudCard onclick="@NavItemClick" Class="d-inline-flex cursor-pointer ma-1" Outlined="true">
+    <MudCardContent Class="d-flex flex-column align-items-center">
+        <MudIcon Icon="@IconName" Color="@IconColor" Size="@IconSize" />
+        <MudText Align="Align.Center" Inline="true">@getShortItemName(@Text)</MudText>
     </MudCardContent>
 </MudCard>
 
 @code {
-    private Size IconSize = Size.Large;
-    private string Icon = Icons.Custom.Uncategorized.Radioactive; // Иконка по умолчанию
-    private Color IconColor = Color.Warning; // Цвет иконки по умолчанию
-    private string Text = "Нажми на иконку"; // Текст под иконкой
-    private string HrefToPage = "/";
+    [Parameter]
+    public Size IconSize { get; set; } = Size.Large; // Размер иконки по умолчанию
+    [Parameter]
+    public string IconName { get; set; } = Icons.Custom.Uncategorized.Radioactive; // Иконка по умолчанию
+    [Parameter]
+    public Color IconColor { get; set; } = Color.Success; // Цвет иконки по умолчанию
+    [Parameter]
+    public string Text { get; set; } = "Нажми на иконку"; // Текст под иконкой
+    [Parameter]
+    public string HrefToPage { get; set; } = "/"; //Ссылка на страницу
+    const int MaxItemNameLength = 10;
+
+    private string getShortItemName(string text) => Text.Length > MaxItemNameLength ? text.Substring(0, MaxItemNameLength - 3) + "..." : text;
 
     private void NavItemClick()
     {
-        // Меняем цвет иконки при нажатии
-        IconColor = IconColor == Color.Warning ? Color.Error : Color.Warning;
-        // NavigationManager.NavigateTo(HrefToPage);
+         NavigationManager.NavigateTo(HrefToPage);
     }
 }

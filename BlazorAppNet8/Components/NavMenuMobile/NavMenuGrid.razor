@@ -1,10 +1,66 @@
-﻿@using BlazorAppNet8.Components
+﻿@page "/icon-items"
+@using MudBlazor
+@using BlazorAppNet8.Components
 @using BlazorAppNet8.Classes
-@using MudBlazor.Services
 @inject NavigationManager NavigationManager
 
-
-
+<MudPaper Elevation="0">
+    <MudGrid Class="pa-0 ma-0">
+        <MudItem xs="12" Class="pa-0 ma-0">
+            <MudStack Row="true" Align="Align.Center" Justify="Justify.Center">
+                <MudIconButton 
+                    Color="Color.Primary" 
+                    Icon="@Icons.Material.Filled.Close" 
+                    OnClick="CloseNavMenu" />
+                <MudTextField @bind-Value="@searchString" 
+                              Label="Поиск" 
+                              Immediate="true"
+                              Variant="Variant.Text" 
+                              Adornment="Adornment.End" 
+                              AdornmentIcon="@Icons.Material.Filled.Search" 
+                              AdornmentColor="Color.Primary" />
+            </MudStack>
+        </MudItem>
+        @foreach (var item in ListMenuItems)
+        {
+            @if (SearchConditionMatch(item.NavText))
+            {
+                <MudItem xs="4" sm="3" md="2" lg="1" Class="pa-0 ma-0 d-flex flex-column justify-content-center align-items-stretch"
+                         Align="Align.Center" 
+                         Justify="Justify.Center">
+                    <NavMenuItem Text="@item.NavText" 
+                                 HrefToPage="@item.NavHref" 
+                                 IconName="@item.NavIconName" 
+                                 IconColor="@item.IconColor" />
+                </MudItem>
+            }
+        }
+    </MudGrid>
+</MudPaper>
 @code {
-    
+    private string searchString = string.Empty;
+
+    private bool SearchConditionMatch(string lookingString){
+        if (searchString.Equals(string.Empty) == true) {
+            return true;
+        }
+        return lookingString.ToLower().Contains(searchString.ToLower());
+    }
+
+    private void CloseNavMenu()
+    {
+        NavigationManager.NavigateTo("/");
+    }
+
+    private List<CustomNavLink> ListMenuItems = [
+        new() { NavText = "Home", NavHref = "/" },
+        new() { NavText = "Sample", NavHref = "/", IconColor = Color.Secondary, NavIconName = Icons.Material.Filled.Book },
+        new() { NavText = "My text", NavHref = "/", IconColor = Color.Error, NavIconName = Icons.Material.Filled.Favorite },
+        new() { NavText = "Account", NavHref = "/", IconColor = Color.Success, NavIconName = Icons.Material.Filled.AccountBox },
+        new() { NavText = "Education", NavHref = "/", IconColor = Color.Warning, NavIconName = Icons.Material.Filled.HistoryEdu },
+        new() { NavText = "Item", NavHref = "/", IconColor = Color.Success, NavIconName = Icons.Material.Filled.List },
+        new() { NavText = "Search", NavHref = "/", IconColor = Color.Secondary, NavIconName = Icons.Material.Filled.Search },
+        new() { NavText = "Exit", NavHref = "/", IconColor = Color.Error, NavIconName = Icons.Material.Filled.ExitToApp },
+    new() { NavText = "And it has incredibly fast steering, so the slightest movement of the wheel causes an immediate dart one way or the other. И управление здесь невероятно отчетливое и быстрое, то есть малейшее движение руля вызывает незамедлительный рывок в ту или иную сторону.", NavHref = "/", IconColor = Color.Error, NavIconName = Icons.Material.Filled.ExitToApp },
+    ];
 }
