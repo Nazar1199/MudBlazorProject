@@ -1,0 +1,73 @@
+﻿@page "/my-diagram"
+@using Blazor.Diagrams.Components
+@using Blazor.Diagrams
+@using Blazor.Diagrams.Core.PathGenerators
+@using Blazor.Diagrams.Core.Routers
+@using Blazor.Diagrams.Options
+@using Blazor.Diagrams.Core.Models
+@using Blazor.Diagrams.Core.Anchors
+@using Blazor.Diagrams.Core.Geometry
+
+<div class="diagram-container">
+    <CascadingValue Value="Diagram" IsFixed="true">
+        <DiagramCanvas></DiagramCanvas>
+    </CascadingValue>
+</div>
+
+@code {
+    private BlazorDiagram Diagram { get; set; } = null!;
+
+    protected override void OnInitialized()
+    {
+        var options = new BlazorDiagramOptions
+            {
+                AllowMultiSelection = true,
+                Zoom =
+            {
+                Enabled = false,
+            },
+                Links =
+            {
+                DefaultRouter = new NormalRouter(),
+                DefaultPathGenerator = new SmoothPathGenerator()
+            },
+            };
+
+        Diagram = new BlazorDiagram(options);
+
+        // Добавляем узлы
+        var firstNode = Diagram.Nodes.Add(new NodeModel(position: new Point(50, 50))
+            {
+                Title = "Node 1"
+            });
+        var secondNode = Diagram.Nodes.Add(new NodeModel(position: new Point(200, 100))
+            {
+                Title = "Node 2"
+            });
+        var thirdNode = Diagram.Nodes.Add(new NodeModel(position: new Point(250, 100))
+            {
+                Title = "Node 3"
+            });
+        var fourthNode = Diagram.Nodes.Add(new NodeModel(position: new Point(300, 100))
+            {
+                Title = "Node 4"
+            });
+
+        // Добавляем порты
+        var leftPort = secondNode.AddPort(PortAlignment.Left);
+        var rightPort = secondNode.AddPort(PortAlignment.Right);
+
+        // Создаем связь между узлами
+        var sourceAnchor = new ShapeIntersectionAnchor(firstNode);
+        var targetAnchor = new SinglePortAnchor(leftPort);
+        var link = Diagram.Links.Add(new LinkModel(sourceAnchor, targetAnchor));
+    }
+}
+
+<style>
+    .diagram-container {
+        width: 100%;
+        height: 400px;
+        border: 1px solid black;
+    }
+</style>
