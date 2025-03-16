@@ -73,14 +73,15 @@
         currentUser = getSampleUserObject();
     }
 
-    public User currentUser = new User(0);
+    public User currentUser = new User();
 
     private async Task<User> getCurrentUserAsync(){
         Task.Delay(3000);
         return getSampleUserObject();
     }
     private User getSampleUserObject(){
-        User sampleUser = new User(1);
+        User sampleUser = new User();
+        sampleUser.Id = 0;
         sampleUser.FirstName = "Иван";
         sampleUser.LastName = "Иванов";
         sampleUser.Patronymic = "Иванович";

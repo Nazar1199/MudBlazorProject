@@ -8,6 +8,8 @@
 @using Blazor.Diagrams.Core.Anchors
 @using Blazor.Diagrams.Core.Geometry
 
+@namespace BlazorAppNet8.Components.MyNodes
+
 <div class="diagram-container">
     <CascadingValue Value="Diagram" IsFixed="true">
         <DiagramCanvas></DiagramCanvas>
@@ -34,6 +36,7 @@
             };
 
         Diagram = new BlazorDiagram(options);
+        Diagram.RegisterComponent<UserNode, UserWidget>();
 
         // Добавляем узлы
         var firstNode = Diagram.Nodes.Add(new NodeModel(position: new Point(50, 50))
@@ -50,8 +53,17 @@
             });
         var fourthNode = Diagram.Nodes.Add(new NodeModel(position: new Point(300, 100))
             {
-                Title = "Node 4"
+                Title = "Node 4 sample"
             });
+        var userNode = Diagram.Nodes.Add(new UserNode(position: new Point(300, 120))
+        {
+            user = new User
+            {
+                FirstName = "John",
+                LastName = "Doe",
+                Email = "sample.sample@mail.ru"
+            }
+        });
 
         // Добавляем порты
         var leftPort = secondNode.AddPort(PortAlignment.Left);

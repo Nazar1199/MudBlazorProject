@@ -12,9 +12,5 @@
 		public string Phone { get; set; } = string.Empty;
 		public string? AvatarURL { get; set; } = null;
 
-		public User(int id)
-		{
-			Id = id;
-		}
 	}
 }

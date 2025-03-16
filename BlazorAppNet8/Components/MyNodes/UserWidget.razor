@@ -1,0 +1,26 @@
+﻿@using Blazor.Diagrams.Components.Renderers;
+
+<div class="userNode">
+    <p>@Node.user.FirstName</p>
+    <p>@Node.user.LastName</p>
+    <p>@Node.user.Email</p>
+
+
+    @foreach (var port in Node.Ports)
+    {
+        <PortRenderer @key="port" Port="port" />
+    }
+
+</div>
+
+@code {
+    // This gets filled by the library
+    [Parameter] public UserNode Node { get; set; } = null!;
+}
+<style>
+    .userNode {
+        background-color: #f8f9fa;
+        border: 1px solid #ced4da;
+        border-radius: 10px;
+    }
+</style>
