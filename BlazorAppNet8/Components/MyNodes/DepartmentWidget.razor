@@ -1,5 +1,6 @@
 ﻿@using Blazor.Diagrams.Components.Renderers;
 @using Blazor.Diagrams.Core.Models;
+@using BlazorAppNet8.Classes;
 
 <MudPaper class="departmentNode d-flex flex-column pa-2 ma-2 justify-content-center align-items-center" Elevation="3">
     @if (IsEditing)
@@ -21,8 +22,8 @@
         {
             <MudButton OnClick="StartEditing">Edit</MudButton>
             <MudButton OnClick="DeleteDepartment">Del</MudButton>
+            <MudButton OnClick="AddChildDepartment">Add</MudButton>
         }
-        <MudButton OnClick="AddChildDepartment">Add</MudButton>
     </MudButtonGroup>
 
     @foreach (var port in Node.Ports)
@@ -35,12 +36,10 @@
     [Parameter]
     public DepartmentNode Node { get; set; } = null!;
 
-    private bool IsEditing = false;
+    [CascadingParameter]
+    public MyDiagram ParentComponent { get; set; } = null!;
 
-    protected override void OnParametersSet()
-    {
-        //SelectedParentId = Department.ParentId;
-    }
+    private bool IsEditing = false;
 
     private void StartEditing()
     {
@@ -49,24 +48,27 @@
 
     private void SaveChanges()
     {
-        //Department.ParentId = SelectedParentId;
         IsEditing = false;
-        // Здесь можно добавить логику для сохранения изменений в базе данных
+        ParentComponent.UpdateDepartmentName(Node.Department.Id, Node.Department.Name);
     }
 
     private void CancelEditing()
     {
         IsEditing = false;
-        //SelectedParentId = Department.ParentId;
     }
 
     private void DeleteDepartment()
     {
-        // Здесь можно добавить логику для удаления подразделения из базы данных
+        Console.WriteLine("Deleting...");
+        Console.WriteLine(Node.Department.Id);
+        Console.WriteLine("ParentComponent:");
+        Console.WriteLine(ParentComponent);
+        Console.WriteLine(ParentComponent == null);
+        ParentComponent.DeleteDepartment(Node.Department.Id);
     }
 
     private void AddChildDepartment()
     {
-        // Здесь можно добавить логику для добавления нового подразделения
+        ParentComponent.AddChildDepartment(Node.Department.Id);
     }
 }

@@ -24,9 +24,11 @@
     protected override void OnInitialized()
     {
         Departments = DepartmentGenerator.GenerateDepartments();
+        InitializeDiagram();
+    }
 
-        var nodePositions = NodePositionCalculator.CalculatePositions(Departments);
-
+    private void InitializeDiagram()
+    {
         var options = new BlazorDiagramOptions
             {
                 AllowMultiSelection = true,
@@ -44,8 +46,22 @@
         Diagram = new BlazorDiagram(options);
         Diagram.RegisterComponent<DepartmentNode, DepartmentWidget>();
 
+        UpdateDiagram();
+    }
+
+    private void UpdateDiagram()
+    {
+        // Очищаем текущие ноды и связи
+        Diagram.Nodes.Clear();
+        Diagram.Links.Clear();
+
+        // Рассчет координат для нод
+        var nodePositions = NodePositionCalculator.CalculatePositions(Departments);
+
+        // Словарь для хранения нод по их Id
         var nodeDictionary = new Dictionary<int, DepartmentNode>();
 
+        // Создаем ноды для каждого подразделения
         foreach (var department in Departments)
         {
             var position = nodePositions[department.Id];
@@ -58,20 +74,70 @@
             nodeDictionary[department.Id] = node;
         }
 
+        // Создаем связи между подразделениями
         foreach (var department in Departments)
         {
             if (department.ParentId.HasValue && nodeDictionary.TryGetValue(department.ParentId.Value, out var parentNode))
             {
                 var childNode = nodeDictionary[department.Id];
 
+                // Добавляем порты к родительской и дочерней нодам
                 var parentPort = parentNode.AddPort(PortAlignment.Bottom);
                 var childPort = childNode.AddPort(PortAlignment.Top);
 
+                // Создаем связь между портами
                 var sourceAnchor = new SinglePortAnchor(parentPort);
                 var targetAnchor = new SinglePortAnchor(childPort);
-                var link = Diagram.Links.Add(new LinkModel(sourceAnchor, targetAnchor));
-                link.Router = new NormalRouter();
+                Diagram.Links.Add(new LinkModel(sourceAnchor, targetAnchor));
             }
+        }
+
+        Console.WriteLine("Diagram:");
+        Console.WriteLine(Diagram);
+        Console.WriteLine(Diagram == null);
+    }
+
+    // Метод для добавления новой дочерней ноды
+    public void AddChildDepartment(int parentId)
+    {
+        var newDepartment = new Department
+            {
+                Id = Departments.Max(d => d.Id) + 1, // Новый уникальный Id
+                Name = $"Новое подразделение {Departments.Max(d => d.Id) + 1}",
+                ParentId = parentId
+            };
+
+        Departments.Add(newDepartment);
+        UpdateDiagram();
+    }
+
+    // Метод для удаления ноды
+    public void DeleteDepartment(int departmentId)
+    {
+        var departmentToRemove = Departments.FirstOrDefault(d => d.Id == departmentId);
+        if (departmentToRemove != null)
+        {
+            Departments.Remove(departmentToRemove);
+
+            // Удаляем дочерние подразделения (если есть)
+            var children = Departments.Where(d => d.ParentId == departmentId).ToList();
+            foreach (var child in children)
+            {
+                Departments.Remove(child);
+            }
+
+            UpdateDiagram();
+        }
+    }
+
+    // Метод для обновления названия ноды
+    public void UpdateDepartmentName(int departmentId, string newName)
+    {
+        var department = Departments.FirstOrDefault(d => d.Id == departmentId);
+        if (department != null)
+        {
+            department.Name = newName;
+            UpdateDiagram();
         }
     }
 }
@@ -79,7 +145,7 @@
 <style>
     .diagram-container {
         width: 100%;
-        height: 800px;
+        height: 850px;
         border: solid 1px black;
         border-radius: 10px;
     }
