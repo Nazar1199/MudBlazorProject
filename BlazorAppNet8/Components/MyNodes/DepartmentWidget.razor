@@ -1,0 +1,72 @@
+﻿@using Blazor.Diagrams.Components.Renderers;
+@using Blazor.Diagrams.Core.Models;
+
+<MudPaper class="departmentNode d-flex flex-column pa-2 ma-2 justify-content-center align-items-center" Elevation="3">
+    @if (IsEditing)
+    {
+        <MudTextField @bind-Value="Node.Department.Name" Label="Название подразделения" />
+    }
+    else
+    {
+        <MudText Typo="Typo.h6">@Node.Department.Name</MudText>
+    }
+
+    <MudButtonGroup>
+        @if (IsEditing)
+        {
+            <MudButton OnClick="SaveChanges">Save</MudButton>
+            <MudButton OnClick="CancelEditing">Cancel</MudButton>
+        }
+        else
+        {
+            <MudButton OnClick="StartEditing">Edit</MudButton>
+            <MudButton OnClick="DeleteDepartment">Del</MudButton>
+        }
+        <MudButton OnClick="AddChildDepartment">Add</MudButton>
+    </MudButtonGroup>
+
+    @foreach (var port in Node.Ports)
+    {
+        <PortRenderer @key="port" Port="port" />
+    }
+</MudPaper>
+
+@code {
+    [Parameter]
+    public DepartmentNode Node { get; set; } = null!;
+
+    private bool IsEditing = false;
+
+    protected override void OnParametersSet()
+    {
+        //SelectedParentId = Department.ParentId;
+    }
+
+    private void StartEditing()
+    {
+        IsEditing = true;
+    }
+
+    private void SaveChanges()
+    {
+        //Department.ParentId = SelectedParentId;
+        IsEditing = false;
+        // Здесь можно добавить логику для сохранения изменений в базе данных
+    }
+
+    private void CancelEditing()
+    {
+        IsEditing = false;
+        //SelectedParentId = Department.ParentId;
+    }
+
+    private void DeleteDepartment()
+    {
+        // Здесь можно добавить логику для удаления подразделения из базы данных
+    }
+
+    private void AddChildDepartment()
+    {
+        // Здесь можно добавить логику для добавления нового подразделения
+    }
+}

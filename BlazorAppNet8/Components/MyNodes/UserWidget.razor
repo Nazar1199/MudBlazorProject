@@ -1,9 +1,11 @@
 ﻿@using Blazor.Diagrams.Components.Renderers;
 
-<div class="userNode">
-    <p>@Node.user.FirstName</p>
-    <p>@Node.user.LastName</p>
-    <p>@Node.user.Email</p>
+<MudPaper class="userNode d-flex flex-column pa-2 ma-2 justify-content-center align-items-center" Elevation="3">
+    <MudContainer Class="d-flex flex-row justify-content-center align-items-center">
+        <MudText Typo="cardTypo">@Node.User.FirstName @Node.User.LastName</MudText>
+    </MudContainer>
+    <MudText Typo="Typo.subtitle1">@Node.User.Email</MudText>
+    <MudButton OnClick="@(() => Console.WriteLine("Clicked: " + Node.User.Email))">Click</MudButton>
 
 
     @foreach (var port in Node.Ports)
@@ -11,11 +13,12 @@
         <PortRenderer @key="port" Port="port" />
     }
 
-</div>
+</MudPaper>
 
 @code {
-    // This gets filled by the library
-    [Parameter] public UserNode Node { get; set; } = null!;
+    [Parameter] 
+    public UserNode Node { get; set; } = null!;
+    private Typo cardTypo = Typo.h6;
 }
 <style>
     .userNode {

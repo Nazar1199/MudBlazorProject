@@ -2,24 +2,14 @@
 {
 	public static class CommonClasses
 	{
-		public static string getFullName(User user)
+		public static string getFullName(INameProvider provider)
 		{
-			string fullName = $"{user.LastName} {user.FirstName}";
-			if (string.IsNullOrEmpty(user.Patronymic) == false)
-			{
-				fullName += $" {user.Patronymic}";
-			}
-			return fullName;
+			return provider.GetFullName();
 		}
 
-		public static string getShortName(User user)
+		public static string getShortName(INameProvider provider)
 		{
-			string shortName = $"{user.LastName} {user.FirstName[0]}.";
-			if (string.IsNullOrEmpty(user.Patronymic) == false)
-			{
-				shortName += $" {user.Patronymic[0]}.";
-			}
-			return shortName;
+			return provider.GetShortName();
 		}
 
 		public static string getFirstChar(string stringValue)
