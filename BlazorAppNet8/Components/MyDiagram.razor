@@ -12,8 +12,10 @@
 @namespace BlazorAppNet8.Components.MyNodes
 
 <div class="diagram-container">
-    <CascadingValue Value="Diagram" IsFixed="true">
-        <DiagramCanvas></DiagramCanvas>
+    <CascadingValue Value="this" IsFixed="true">
+        <CascadingValue Value="Diagram" IsFixed="true">
+            <DiagramCanvas></DiagramCanvas>
+        </CascadingValue>
     </CascadingValue>
 </div>
 
@@ -30,18 +32,18 @@
     private void InitializeDiagram()
     {
         var options = new BlazorDiagramOptions
-            {
-                AllowMultiSelection = true,
-                Zoom =
+        {
+            AllowMultiSelection = true,
+            Zoom =
             {
                 Enabled = false,
             },
-                Links =
+            Links =
             {
                 DefaultRouter = new NormalRouter(),
                 DefaultPathGenerator = new SmoothPathGenerator()
             },
-            };
+        };
 
         Diagram = new BlazorDiagram(options);
         Diagram.RegisterComponent<DepartmentNode, DepartmentWidget>();
@@ -66,9 +68,9 @@
         {
             var position = nodePositions[department.Id];
             var node = new DepartmentNode(position)
-                {
-                    Department = department
-                };
+            {
+                Department = department
+            };
 
             Diagram.Nodes.Add(node);
             nodeDictionary[department.Id] = node;
@@ -101,11 +103,11 @@
     public void AddChildDepartment(int parentId)
     {
         var newDepartment = new Department
-            {
-                Id = Departments.Max(d => d.Id) + 1, // Новый уникальный Id
-                Name = $"Новое подразделение {Departments.Max(d => d.Id) + 1}",
-                ParentId = parentId
-            };
+        {
+            Id = Departments.Max(d => d.Id) + 1, // Новый уникальный Id
+            Name = $"Новое подразделение {Departments.Max(d => d.Id) + 1}",
+            ParentId = parentId
+        };
 
         Departments.Add(newDepartment);
         UpdateDiagram();

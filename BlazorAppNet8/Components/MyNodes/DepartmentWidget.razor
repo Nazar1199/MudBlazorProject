@@ -59,11 +59,6 @@
 
     private void DeleteDepartment()
     {
-        Console.WriteLine("Deleting...");
-        Console.WriteLine(Node.Department.Id);
-        Console.WriteLine("ParentComponent:");
-        Console.WriteLine(ParentComponent);
-        Console.WriteLine(ParentComponent == null);
         ParentComponent.DeleteDepartment(Node.Department.Id);
     }
 
