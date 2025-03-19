@@ -18,7 +18,14 @@ public class DepartmentGenerator
 		departments.Add(new Department
 		{
 			Id = 0,
-			Name = $"Корневое одразделение",
+			Name = $"Корневое подразделение",
+			ParentId = null
+		});
+
+		departments.Add(new Department
+		{
+			Id = -1,
+			Name = $"Второе корневое подразделение",
 			ParentId = null
 		});
 
