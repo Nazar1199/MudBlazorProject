@@ -3,27 +3,11 @@
 @using BlazorAppNet8.Classes;
 
 <MudPaper class="departmentNode d-flex flex-column pa-2 ma-2 justify-content-center align-items-center" Elevation="3">
-    @if (IsEditing)
-    {
-        <MudTextField @bind-Value="Node.Department.Name" Label="Название подразделения" />
-    }
-    else
-    {
-        <MudText Typo="Typo.h6">@Node.Department.Name</MudText>
-    }
+    <MudText Typo="Typo.h6">@Node.Department.Name</MudText>
 
-    <MudButtonGroup>
-        @if (IsEditing)
-        {
-            <MudButton OnClick="SaveChanges">Save</MudButton>
-            <MudButton OnClick="CancelEditing">Cancel</MudButton>
-        }
-        else
-        {
-            <MudButton OnClick="StartEditing">Edit</MudButton>
-            <MudButton OnClick="DeleteDepartment">Del</MudButton>
-            <MudButton OnClick="AddChildDepartment">Add</MudButton>
-        }
+    <MudButtonGroup Variant="Variant.Outlined">
+        <MudIconButton Icon="@Icons.Material.Filled.Add" OnClick="AddChildDepartment">Add</MudIconButton>
+        <MudIconButton Icon="@Icons.Material.Filled.Delete" OnClick="DeleteDepartment">Del</MudIconButton>
     </MudButtonGroup>
 
     @foreach (var port in Node.Ports)
@@ -39,24 +23,6 @@
     [CascadingParameter]
     public MyDiagram ParentComponent { get; set; } = null!;
 
-    private bool IsEditing = false;
-
-    private void StartEditing()
-    {
-        IsEditing = true;
-    }
-
-    private void SaveChanges()
-    {
-        IsEditing = false;
-        ParentComponent.UpdateDepartmentName(Node.Department.Id, Node.Department.Name);
-    }
-
-    private void CancelEditing()
-    {
-        IsEditing = false;
-    }
-
     private void DeleteDepartment()
     {
         ParentComponent.DeleteDepartment(Node.Department.Id);
@@ -67,3 +33,8 @@
         ParentComponent.AddChildDepartment(Node.Department.Id);
     }
 }
+<style>
+    .departmentNode {
+        max-width: 200px;
+    }
+</style>
