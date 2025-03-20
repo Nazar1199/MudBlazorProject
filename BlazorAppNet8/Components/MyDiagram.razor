@@ -56,38 +56,69 @@
         Diagram.Nodes.Clear();
         Diagram.Links.Clear();
 
-        var nodePositions = NodePositionCalculator.CalculatePositions(Departments);
-
-        var nodeDictionary = new Dictionary<int, DepartmentNode>();
-
-        foreach (var department in Departments)
+        // Рисуем только корневые ноды
+        var rootNodes = Departments.Where(d => !d.ParentId.HasValue).ToList();
+        foreach (var root in rootNodes)
         {
-            var position = nodePositions[department.Id];
-            var node = new DepartmentNode(position)
-            {
-                Department = department
-            };
-
-            Diagram.Nodes.Add(node);
-            nodeDictionary[department.Id] = node;
+            AddNodeWithChildren(root, false); // Изначально дочерние ноды скрыты
         }
+    }
 
-        foreach (var department in Departments)
+    private void AddNodeWithChildren(Department department, bool showChildren)
+    {
+        var position = NodePositionCalculator.CalculatePositions(Departments)[department.Id];
+        var node = new DepartmentNode(position)
         {
-            if (department.ParentId.HasValue && nodeDictionary.TryGetValue(department.ParentId.Value, out var parentNode))
-            {
-                var childNode = nodeDictionary[department.Id];
+            Department = department
+        };
 
-                var parentPort = parentNode.AddPort(PortAlignment.Bottom);
+        Diagram.Nodes.Add(node);
+
+        if (showChildren)
+        {
+            var children = Departments.Where(d => d.ParentId == department.Id).ToList();
+            foreach (var child in children)
+            {
+                AddNodeWithChildren(child, false); // Дочерние ноды скрыты по умолчанию
+                var parentPort = node.AddPort(PortAlignment.Bottom);
+                var childNode = Diagram.Nodes.First(n => n is DepartmentNode dn && dn.Department.Id == child.Id);
                 var childPort = childNode.AddPort(PortAlignment.Top);
 
                 var sourceAnchor = new SinglePortAnchor(parentPort);
                 var targetAnchor = new SinglePortAnchor(childPort);
-                var link = new LinkModel(sourceAnchor, targetAnchor);
-                link.TargetMarker = LinkMarker.Arrow;
+                var link = new LinkModel(sourceAnchor, targetAnchor)
+                {
+                    TargetMarker = LinkMarker.Arrow
+                };
                 Diagram.Links.Add(link);
             }
         }
+
+        node.OnToggleChildren = () =>
+        {
+            if (Diagram.Nodes.Any(n => n is DepartmentNode dn && dn.Department.ParentId == department.Id))
+            {
+                // Скрываем дочерние ноды
+                var childNodes = Diagram.Nodes.Where(n => n is DepartmentNode dn && dn.Department.ParentId == department.Id).ToList();
+                foreach (var childNode in childNodes)
+                {
+                    Diagram.Nodes.Remove(childNode);
+                }
+
+                var childLinks = Diagram.Links.Where(l => 
+                    l.Source is SinglePortAnchor sourceAnchor && sourceAnchor.Port.Parent == node ||
+                    l.Target is SinglePortAnchor targetAnchor && targetAnchor.Port.Parent == node).ToList();
+                foreach (var link in childLinks)
+                {
+                    Diagram.Links.Remove(link);
+                }
+            }
+            else
+            {
+                // Показываем дочерние ноды
+                AddNodeWithChildren(department, true);
+            }
+        };
     }
 
     public void AddChildDepartment(int parentId)

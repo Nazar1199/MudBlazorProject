@@ -8,6 +8,7 @@
     <MudButtonGroup Variant="Variant.Outlined">
         <MudIconButton Icon="@Icons.Material.Filled.Add" OnClick="AddChildDepartment">Add</MudIconButton>
         <MudIconButton Icon="@Icons.Material.Filled.Delete" OnClick="DeleteDepartment">Del</MudIconButton>
+        <MudIconButton Icon="@Icons.Material.Filled.ExpandMore" OnClick="ToggleChildren">Toggle</MudIconButton>
     </MudButtonGroup>
 
     @foreach (var port in Node.Ports)
@@ -31,6 +32,11 @@
     private void AddChildDepartment()
     {
         ParentComponent.AddChildDepartment(Node.Department.Id);
+    }
+
+    private void ToggleChildren()
+    {
+        Node.OnToggleChildren?.Invoke();
     }
 }
 <style>

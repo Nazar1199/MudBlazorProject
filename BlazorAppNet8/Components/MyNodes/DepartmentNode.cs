@@ -8,4 +8,5 @@ public class DepartmentNode : NodeModel
 	public DepartmentNode(Point? position = null) : base(position) { }
 
 	public Department Department { get; set; }
+	public Action? OnToggleChildren { get; set; }
 }
