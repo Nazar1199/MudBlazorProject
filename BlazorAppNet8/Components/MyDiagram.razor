@@ -82,11 +82,13 @@
                 AddNodeWithChildren(child, false); // Дочерние ноды скрыты по умолчанию
                 var parentPort = node.AddPort(PortAlignment.Bottom);
                 var childNode = Diagram.Nodes.First(n => n is DepartmentNode dn && dn.Department.Id == child.Id);
-                var childPort = childNode.AddPort(PortAlignment.Top);
-
+                var childPortBottom = childNode.AddPort(PortAlignment.Bottom);
+                var childPortTop = childNode.AddPort(PortAlignment.Top);
+                Console.WriteLine("****node deliver****");
+                Console.WriteLine("Ports count: " + childNode.Ports.Count);
                 var sourceAnchor = new SinglePortAnchor(parentPort);
-                var targetAnchor = new SinglePortAnchor(childPort);
-                var link = new LinkModel(sourceAnchor, targetAnchor)
+                var targetAnchor = new SinglePortAnchor(childPortTop);
+                var link = new LinkModel(node, childNode)
                 {
                     TargetMarker = LinkMarker.Arrow
                 };
