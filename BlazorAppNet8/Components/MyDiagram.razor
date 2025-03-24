@@ -167,11 +167,47 @@
         };
 
         Departments.Add(newDepartment);
+
+        // Preserve the expanded state of nodes
+        var expandedNodes = Diagram.Nodes.OfType<DepartmentNode>()
+            .Where(n => Diagram.Nodes.Any(cn => cn is DepartmentNode dn && dn.Department.ParentId == n.Department.Id))
+            .Select(n => n.Department.Id)
+            .ToHashSet();
+
         UpdateDiagram();
+
+        // Re-expand previously expanded nodes
+        foreach (var nodeId in expandedNodes)
+        {
+            var node = Diagram.Nodes.OfType<DepartmentNode>().FirstOrDefault(n => n.Department.Id == nodeId);
+            if (node != null)
+            {
+                node.OnToggleChildren?.Invoke();
+            }
+        }
+
+        // Automatically expand the parent of the newly created node if not already expanded
+        var parentNode = Diagram.Nodes.OfType<DepartmentNode>().FirstOrDefault(n => n.Department.Id == parentId);
+        if (parentNode != null)
+        {
+            var isParentExpanded = Diagram.Nodes.OfType<DepartmentNode>()
+                .Any(n => n.Department.ParentId == parentId);
+
+            if (!isParentExpanded)
+            {
+                parentNode.OnToggleChildren?.Invoke();
+            }
+        }
     }
 
     public void DeleteDepartment(int departmentId)
     {
+        // Preserve the expanded state of nodes
+        var expandedNodes = Diagram.Nodes.OfType<DepartmentNode>()
+            .Where(n => Diagram.Nodes.Any(cn => cn is DepartmentNode dn && dn.Department.ParentId == n.Department.Id))
+            .Select(n => n.Department.Id)
+            .ToHashSet();
+
         var departmentToRemove = Departments.FirstOrDefault(d => d.Id == departmentId);
         if (departmentToRemove != null)
         {
@@ -184,6 +220,16 @@
             }
 
             UpdateDiagram();
+
+            // Re-expand previously expanded nodes
+            foreach (var nodeId in expandedNodes)
+            {
+                var node = Diagram.Nodes.OfType<DepartmentNode>().FirstOrDefault(n => n.Department.Id == nodeId);
+                if (node != null)
+                {
+                    node.OnToggleChildren?.Invoke();
+                }
+            }
         }
     }
 
