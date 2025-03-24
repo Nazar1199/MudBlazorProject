@@ -42,7 +42,7 @@
             Links =
             {
                 DefaultRouter = new NormalRouter(),
-                DefaultPathGenerator = new SmoothPathGenerator()
+                DefaultPathGenerator = new StraightPathGenerator()
             },
         };
 
@@ -126,6 +126,7 @@
                 var targetAnchor = new SinglePortAnchor(childPort);
                 var link = new LinkModel(sourceAnchor, targetAnchor)
                 {
+                    Router = new OrthogonalRouter(),
                     TargetMarker = LinkMarker.Arrow
                 };
                 Diagram.Links.Add(link);
