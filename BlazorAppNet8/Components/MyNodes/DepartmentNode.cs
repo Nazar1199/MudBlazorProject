@@ -9,4 +9,5 @@ public class DepartmentNode : NodeModel
 
 	public Department Department { get; set; }
 	public Action? OnToggleChildren { get; set; }
+	public bool IsExpanded { get; set; }
 }

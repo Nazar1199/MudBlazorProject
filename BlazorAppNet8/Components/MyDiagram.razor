@@ -35,15 +35,8 @@
         var options = new BlazorDiagramOptions
         {
             AllowMultiSelection = false,
-            Zoom =
-            {
-                Enabled = false,
-            },
-            Links =
-            {
-                DefaultRouter = new NormalRouter(),
-                DefaultPathGenerator = new StraightPathGenerator()
-            },
+            Zoom = { Enabled = false, },
+            Links = { DefaultRouter = new NormalRouter(), DefaultPathGenerator = new StraightPathGenerator() },
         };
 
         Diagram = new BlazorDiagram(options);
@@ -54,33 +47,108 @@
 
     private void UpdateDiagram()
     {
-        // Preserve the expanded state of nodes
-        var expandedNodes = Diagram.Nodes.OfType<DepartmentNode>()
-            .Where(n => Diagram.Nodes.Any(cn => cn is DepartmentNode dn && dn.Department.ParentId == n.Department.Id))
-            .Select(n => n.Department.Id)
-            .ToHashSet();
-
         Diagram.Nodes.Clear();
         Diagram.Links.Clear();
 
-        // Рисуем только корневые ноды
         var rootNodes = Departments.Where(d => !d.ParentId.HasValue).ToList();
         foreach (var root in rootNodes)
         {
-            AddNodeWithChildren(root, false); // Изначально дочерние ноды скрыты
-        }
-
-        // Re-expand previously expanded nodes
-        foreach (var nodeId in expandedNodes)
-        {
-            var node = Diagram.Nodes.OfType<DepartmentNode>().FirstOrDefault(n => n.Department.Id == nodeId);
-            if (node != null)
-            {
-                node.OnToggleChildren?.Invoke();
-            }
+            AddNodeWithChildren(root);
         }
 
         RecalculateNodePositions();
+    }
+
+    private void AddNodeWithChildren(Department department)
+    {
+        var node = Diagram.Nodes.OfType<DepartmentNode>().FirstOrDefault(n => n.Department.Id == department.Id);
+        if (node == null)
+        {
+            var position = NodePositionCalculator.CalculatePositions(Departments)[department.Id];
+            node = new DepartmentNode(position) { Department = department };
+            Diagram.Nodes.Add(node);
+        }
+
+        if (node.IsExpanded)
+        {
+            var children = Departments.Where(d => d.ParentId == department.Id).ToList();
+            foreach (var child in children)
+            {
+                AddNodeWithChildren(child);
+                AddLinkBetweenNodes(node, Diagram.Nodes.OfType<DepartmentNode>().First(n => n.Department.Id == child.Id));
+            }
+        }
+
+        node.OnToggleChildren = () =>
+        {
+            node.IsExpanded = !node.IsExpanded;
+            if (node.IsExpanded)
+            {
+                ExpandNode(node);
+            }
+            else
+            {
+                CollapseNode(node);
+            }
+            RecalculateNodePositions();
+        };
+    }
+
+    private void ExpandNode(DepartmentNode node)
+    {
+        var children = Departments.Where(d => d.ParentId == node.Department.Id).ToList();
+        foreach (var child in children)
+        {
+            AddNodeWithChildren(child);
+            AddLinkBetweenNodes(node, Diagram.Nodes.OfType<DepartmentNode>().First(n => n.Department.Id == child.Id));
+        }
+    }
+
+    private void CollapseNode(DepartmentNode node)
+    {
+        var childNodes = Diagram.Nodes.Where(n => n is DepartmentNode dn && dn.Department.ParentId == node.Department.Id).ToList();
+        foreach (var childNode in childNodes)
+        {
+            RemoveNodeAndLinks(childNode);
+        }
+    }
+
+    private void RemoveNodeAndLinks(NodeModel node)
+    {
+        var linksToRemove = Diagram.Links.Where(l =>
+            (l.Source is SinglePortAnchor sourceAnchor && sourceAnchor.Port.Parent == node) ||
+            (l.Target is SinglePortAnchor targetAnchor && targetAnchor.Port.Parent == node)).ToList();
+
+        foreach (var link in linksToRemove)
+        {
+            Diagram.Links.Remove(link);
+        }
+
+        Diagram.Nodes.Remove(node);
+
+        if (node is DepartmentNode departmentNode)
+        {
+            var grandChildNodes = Diagram.Nodes.Where(n => n is DepartmentNode dn && dn.Department.ParentId == departmentNode.Department.Id).ToList();
+            foreach (var grandChildNode in grandChildNodes)
+            {
+                RemoveNodeAndLinks(grandChildNode);
+            }
+        }
+    }
+
+    private void AddLinkBetweenNodes(DepartmentNode parentNode, DepartmentNode childNode)
+    {
+        var parentPort = parentNode.AddPort(PortAlignment.Bottom);
+        var childPort = childNode.AddPort(PortAlignment.Top);
+
+        var sourceAnchor = new SinglePortAnchor(parentPort);
+        var targetAnchor = new SinglePortAnchor(childPort);
+
+        var receiverPort = childNode.AddPort(new MyCustomPortModel(childNode, true, PortAlignment.Top));
+        var senderPort = parentNode.AddPort(new MyCustomPortModel(parentNode, false, PortAlignment.Top));
+
+        var link = new LinkModel(senderPort, receiverPort) { Router = new OrthogonalRouter(), TargetMarker = LinkMarker.Arrow };
+        Diagram.Links.Add(link);
     }
 
     private void RecalculateNodePositions()
@@ -92,139 +160,47 @@
         {
             if (positions.TryGetValue(node.Department.Id, out var newPosition))
             {
-                node.SetPosition(newPosition.X, newPosition.Y); // Обновляем положение ноды
+                node.SetPosition(newPosition.X, newPosition.Y);
             }
         }
 
-        Diagram.Refresh(); // Обновляем диаграмму для применения изменений
-    }
-
-    private void AddNodeWithChildren(Department department, bool showChildren)
-    {
-        var node = Diagram.Nodes.OfType<DepartmentNode>().FirstOrDefault(n => n.Department.Id == department.Id);
-        if (node == null)
-        {
-            var position = NodePositionCalculator.CalculatePositions(Departments)[department.Id];
-            node = new DepartmentNode(position)
-            {
-                Department = department
-            };
-            Diagram.Nodes.Add(node);
-        }
-
-        if (showChildren)
-        {
-            var children = Departments.Where(d => d.ParentId == department.Id).ToList();
-            foreach (var child in children)
-            {
-                AddNodeWithChildren(child, false); // Дочерние ноды скрыты по умолчанию
-                var parentPort = node.AddPort(PortAlignment.Bottom);
-                var childNode = Diagram.Nodes.First(n => n is DepartmentNode dn && dn.Department.Id == child.Id);
-                var childPort = childNode.AddPort(PortAlignment.Top);
-
-                var sourceAnchor = new SinglePortAnchor(parentPort);
-                var targetAnchor = new SinglePortAnchor(childPort);
-                var link = new LinkModel(sourceAnchor, targetAnchor)
-                {
-                    Router = new OrthogonalRouter(),
-                    TargetMarker = LinkMarker.Arrow
-                };
-                Diagram.Links.Add(link);
-            }
-        }
-
-        node.OnToggleChildren = () =>
-        {
-            var childNodes = Diagram.Nodes.Where(n => n is DepartmentNode dn && dn.Department.ParentId == department.Id).ToList();
-
-            if (childNodes.Any())
-            {
-                // Скрываем дочерние ноды и их связи
-                foreach (var childNode in childNodes)
-                {
-                    Diagram.Nodes.Remove(childNode);
-
-                    var childLinks = Diagram.Links.Where(l =>
-                        l.Source is SinglePortAnchor sourceAnchor && sourceAnchor.Port.Parent == childNode ||
-                        l.Target is SinglePortAnchor targetAnchor && targetAnchor.Port.Parent == childNode).ToList();
-                    foreach (var link in childLinks)
-                    {
-                        Diagram.Links.Remove(link);
-                    }
-
-                    // Рекурсивно скрываем дочерние ноды
-                    var childDepartment = ((DepartmentNode)childNode).Department;
-                    if (childDepartment != null)
-                    {
-                        var grandChildNodes = Diagram.Nodes.Where(n => n is DepartmentNode dn && dn.Department.ParentId == childDepartment.Id).ToList();
-                        foreach (var grandChildNode in grandChildNodes)
-                        {
-                            Diagram.Nodes.Remove(grandChildNode);
-                        }
-                    }
-                }
-            }
-            else
-            {
-                // Показываем дочерние ноды и их связи
-                AddNodeWithChildren(department, true);
-            }
-
-            RecalculateNodePositions(); // Перерасчет положений нод
-        };
+        Diagram.Refresh();
     }
 
     public void AddChildDepartment(int parentId)
+{
+    var newDepartment = new Department
     {
-        var newDepartment = new Department
+        Id = Departments.Max(d => d.Id) + 1,
+        Name = $"Новое подразделение {Departments.Max(d => d.Id) + 1}",
+        ParentId = parentId
+    };
+
+    Departments.Add(newDepartment);
+    var parentNode = Diagram.Nodes.OfType<DepartmentNode>().FirstOrDefault(n => n.Department.Id == parentId);
+
+    if (parentNode != null)
+    {
+        if (!parentNode.IsExpanded)
         {
-            Id = Departments.Max(d => d.Id) + 1,
-            Name = $"Новое подразделение {Departments.Max(d => d.Id) + 1}",
-            ParentId = parentId
-        };
-
-        Departments.Add(newDepartment);
-
-        UpdateDiagram();
-
-        // Automatically expand the parent of the newly created node if not already expanded
-        var parentNode = Diagram.Nodes.OfType<DepartmentNode>().FirstOrDefault(n => n.Department.Id == parentId);
-        if (parentNode != null)
-        {
-            var isParentExpanded = Diagram.Nodes.OfType<DepartmentNode>()
-                .Any(n => n.Department.ParentId == parentId);
-
-            if (!isParentExpanded)
-            {
-                parentNode.OnToggleChildren?.Invoke();
-            }
+            parentNode.IsExpanded = true;
+            ExpandNode(parentNode);
         }
+        AddNodeWithChildren(newDepartment);
+        AddLinkBetweenNodes(parentNode, Diagram.Nodes.OfType<DepartmentNode>().First(n => n.Department.Id == newDepartment.Id));
+        RecalculateNodePositions();
     }
+}
 
     public void DeleteDepartment(int departmentId)
     {
         var departmentToRemove = Departments.FirstOrDefault(d => d.Id == departmentId);
+        var node = Diagram.Nodes.OfType<DepartmentNode>().FirstOrDefault(n => n.Department.Id == departmentId);
+
         if (departmentToRemove != null)
         {
             Departments.Remove(departmentToRemove);
-
-            var children = Departments.Where(d => d.ParentId == departmentId).ToList();
-            foreach (var child in children)
-            {
-                Departments.Remove(child);
-            }
-
-            UpdateDiagram();
-        }
-    }
-
-    public void UpdateDepartmentName(int departmentId, string newName)
-    {
-        var department = Departments.FirstOrDefault(d => d.Id == departmentId);
-        if (department != null)
-        {
-            department.Name = newName;
-            UpdateDiagram();
+            RemoveNodeAndLinks(node);
         }
     }
 }

@@ -12,7 +12,7 @@
     <MudButtonGroup Variant="Variant.Outlined">
         <MudIconButton Icon="@Icons.Material.Filled.Add" OnClick="AddChildDepartment">Add</MudIconButton>
         <MudIconButton Icon="@Icons.Material.Filled.Delete" OnClick="DeleteDepartment">Del</MudIconButton>
-        <MudIconButton Icon="@Icons.Material.Filled.ExpandMore" OnClick="ToggleChildren">Toggle</MudIconButton>
+        <MudIconButton Icon="@(Node.IsExpanded ? Icons.Material.Filled.ExpandLess : Icons.Material.Filled.ExpandMore)" OnClick="ToggleChildren">Toggle</MudIconButton>
     </MudButtonGroup>
 
     @foreach (var port in Node.Ports)
