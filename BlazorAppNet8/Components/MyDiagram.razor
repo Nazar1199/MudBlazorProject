@@ -141,13 +141,7 @@
         var parentPort = parentNode.AddPort(PortAlignment.Bottom);
         var childPort = childNode.AddPort(PortAlignment.Top);
 
-        var sourceAnchor = new SinglePortAnchor(parentPort);
-        var targetAnchor = new SinglePortAnchor(childPort);
-
-        var receiverPort = childNode.AddPort(new MyCustomPortModel(childNode, true, PortAlignment.Top));
-        var senderPort = parentNode.AddPort(new MyCustomPortModel(parentNode, false, PortAlignment.Top));
-
-        var link = new LinkModel(senderPort, receiverPort) { Router = new OrthogonalRouter(), TargetMarker = LinkMarker.Arrow };
+        var link = new LinkModel(parentPort, childPort) { Router = new OrthogonalRouter(), TargetMarker = LinkMarker.Arrow };
         Diagram.Links.Add(link);
     }
 
