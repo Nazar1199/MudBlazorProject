@@ -6,6 +6,7 @@
 @using Blazor.Diagrams.Options
 @using Blazor.Diagrams.Core.Models
 @using Blazor.Diagrams.Core.Anchors
+@using Blazor.Diagrams.Core.Positions
 @using Blazor.Diagrams.Core.Geometry
 @using BlazorAppNet8.Classes
 @using BlazorAppNet8.Components.MyNodes
@@ -141,7 +142,21 @@
         var parentPort = parentNode.AddPort(PortAlignment.Bottom);
         var childPort = childNode.AddPort(PortAlignment.Top);
 
-        var link = new LinkModel(parentPort, childPort) { Router = new OrthogonalRouter(), TargetMarker = LinkMarker.Arrow };
+        var sourceAnchor = new DynamicAnchor(parentNode, new[]
+            {
+            new BoundsBasedPositionProvider(0.5, 0), // Center top
+            new BoundsBasedPositionProvider(0.5, 1), // Center bottom
+        });
+
+        var targetAnchor = new DynamicAnchor(childNode, new[]
+            {
+            new BoundsBasedPositionProvider(0.5, 0), // Center top
+            new BoundsBasedPositionProvider(0.5, 1), // Center bottom
+        });
+        // Diagram.Links.Add(new LinkModel(daSourceAnchor, someTargetAnchor));
+
+
+        var link = new LinkModel(sourceAnchor, targetAnchor) { Router = new OrthogonalRouter(), TargetMarker = LinkMarker.Arrow };
         Diagram.Links.Add(link);
     }
 
