@@ -1,0 +1,15 @@
+﻿@using BlazorAppNet8.Components.MyNodes.Interfaces
+@inherits AbstractDiagramBase<TItem, TNode>
+@typeparam TItem where TItem : IHierarchyItem
+@typeparam TNode where TNode : INode<TItem>
+
+<div class="diagram-container">
+    <CascadingValue Value="this" IsFixed="true">
+        <CascadingValue Value="Diagram" IsFixed="true">
+            <DiagramCanvas></DiagramCanvas>
+        </CascadingValue>
+    </CascadingValue>
+</div>
+
+@code {
+}

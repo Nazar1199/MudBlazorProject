@@ -1,8 +1,10 @@
 ﻿@page "/diagram"
 @using BlazorAppNet8.Components
+@using BlazorAppNet8.Components.MyNodes
+@using BlazorAppNet8.Classes;
 
-
+<MyDiagram hierarchyItems="@list"></MyDiagram>
 
 @code {
-
+    List<Department> list = DepartmentGenerator.GenerateDepartments();
 }

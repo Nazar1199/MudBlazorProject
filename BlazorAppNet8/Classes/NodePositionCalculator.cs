@@ -5,6 +5,7 @@
 	using System.Linq;
 	using Blazor.Diagrams.Core.Geometry;
     using BlazorAppNet8.Components.MyNodes;
+	using BlazorAppNet8.Components.MyNodes.Interfaces;
 
     public class NodePositionCalculator
 	{
@@ -18,11 +19,13 @@
 
 		private const int InitialY = 50;
 
-		public static Dictionary<int, Point> CalculatePositions(List<Department> departments)
+		private const int DiagramWidth = 250;
+
+		public static Dictionary<int, Point> CalculatePositions(List<IHierarchyItem> HierarchyItems)
 		{
 			var positions = new Dictionary<int, Point>();
 
-			var levels = GroupNodesByLevel(departments);
+			var levels = GroupNodesByLevel(HierarchyItems);
 
 			foreach (var level in levels)
 			{
@@ -42,33 +45,6 @@
 					var department = nodesOnLevel[i];
 					double x = startX + i * HorizontalSpacing;
 					positions[department.Id] = new Point(x, y);
-				}
-			}
-
-			return positions;
-		}
-
-		public static Dictionary<int, Point> CalculateVisiblePositions(List<DepartmentNode> visibleNodes)
-		{
-			var positions = new Dictionary<int, Point>();
-			var levels = GroupNodesByLevel(visibleNodes);
-
-			foreach (var level in levels)
-			{
-				int levelIndex = level.Key;
-				var nodesOnLevel = level.Value;
-
-				int nodeCount = nodesOnLevel.Count;
-				double totalWidth = nodeCount * HorizontalSpacing;
-
-				double startX = InitialX + (DiagramWidth - totalWidth) / 2;
-				double y = InitialY + levelIndex * VerticalSpacing;
-
-				for (int i = 0; i < nodeCount; i++)
-				{
-					var node = nodesOnLevel[i];
-					double x = startX + i * HorizontalSpacing;
-					positions[node.Department.Id] = new Point(x, y);
 				}
 			}
 
@@ -104,23 +80,22 @@
 
 			return levels;
 		}
-
-		private static Dictionary<int, List<DepartmentNode>> GroupNodesByLevel(List<DepartmentNode> visibleNodes)
+		private static Dictionary<int, List<IHierarchyItem>> GroupNodesByLevel(List<IHierarchyItem> NodeItems)
 		{
-			var levels = new Dictionary<int, List<DepartmentNode>>();
+			var levels = new Dictionary<int, List<IHierarchyItem>>();
 
-			var rootNodes = visibleNodes.Where(n => !n.Department.ParentId.HasValue).ToList();
+			var rootNodes = NodeItems.Where(d => !d.ParentId.HasValue).ToList();
 			levels[0] = rootNodes;
 
 			int currentLevel = 0;
 			while (levels.ContainsKey(currentLevel))
 			{
 				var currentNodes = levels[currentLevel];
-				var nextLevelNodes = new List<DepartmentNode>();
+				var nextLevelNodes = new List<IHierarchyItem>();
 
 				foreach (var node in currentNodes)
 				{
-					var children = visibleNodes.Where(n => n.Department.ParentId == node.Department.Id).ToList();
+					var children = NodeItems.Where(d => d.ParentId == node.Id).ToList();
 					nextLevelNodes.AddRange(children);
 				}
 
@@ -134,7 +109,5 @@
 
 			return levels;
 		}
-
-		private const int DiagramWidth = 250;
 	}
 }

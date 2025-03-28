@@ -1,0 +1,55 @@
+﻿@page "/department-diagram"
+@inherits BaseDiagram<Department, DepartmentNode>
+@using Blazor.Diagrams.Core.Models;
+@using BlazorAppNet8.Classes;
+@using BlazorAppNet8.Components.MyNodes
+
+@code {
+    protected override void InitializeDiagram()
+    {
+        base.InitializeDiagram();
+        Diagram.RegisterComponent<DepartmentNode, DepartmentWidget>();
+    }
+
+    protected override NodeModel CreateDiagramNode(DepartmentNode node)
+    {
+        return new DepartmentNode(node.Item)
+            {
+                Position = new Point(0, 0),
+                IsExpanded = node.IsExpanded
+            };
+    }
+
+    protected override void AddLinkBetweenNodes(DepartmentNode source, DepartmentNode target)
+    {
+        var sourcePort = source.AddPort(PortAlignment.Bottom);
+        var targetPort = target.AddPort(PortAlignment.Top);
+
+        var link = new LinkModel(
+            new SinglePortAnchor(sourcePort),
+            new SinglePortAnchor(targetPort))
+            {
+                Router = new OrthogonalRouter(),
+                TargetMarker = LinkMarker.Arrow
+            };
+
+        Diagram.Links.Add(link);
+    }
+
+    protected override void RecalculatePositions()
+    {
+        var positions = NodePositionCalculator.CalculatePositions(
+            Nodes.Select(n => n.Item).ToList()
+        );
+
+        foreach (var node in Diagram.Nodes.OfType<DepartmentNode>())
+        {
+            if (positions.TryGetValue(node.Item.Id, out var pos))
+            {
+                node.Position = pos;
+            }
+        }
+
+        Diagram.Refresh();
+    }
+}

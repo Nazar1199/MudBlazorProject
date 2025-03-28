@@ -7,7 +7,7 @@
         Src="https://th.bing.com/th/id/OIP.UhCirLf6ts3N_rbZsCTUEQHaIX?rs=1&pid=ImgDetMain" 
         Alt="Department Image" 
         Style="width: 50px; height: 50px;" />
-    <MudText Typo="Typo.h6">@Node.Department.Name</MudText>
+    <MudText Typo="Typo.h6">@Node.Item.Name</MudText>
 
     <MudButtonGroup Variant="Variant.Outlined">
         <MudIconButton Icon="@Icons.Material.Filled.Add" OnClick="AddChildDepartment">Add</MudIconButton>
@@ -30,12 +30,12 @@
 
     private void DeleteDepartment()
     {
-        ParentComponent.DeleteDepartment(Node.Department.Id);
+        ParentComponent.DeleteDepartment(Node.Item.Id);
     }
 
     private void AddChildDepartment()
     {
-        ParentComponent.AddChildDepartment(Node.Department.Id);
+        ParentComponent.AddChildDepartment(Node.Item.Id);
     }
 
     private void ToggleChildren()

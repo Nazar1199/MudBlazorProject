@@ -10,6 +10,7 @@
 @using Blazor.Diagrams.Core.Geometry
 @using BlazorAppNet8.Classes
 @using BlazorAppNet8.Components.MyNodes
+@using BlazorAppNet8.Components.MyNodes.Interfaces;
 
 @namespace BlazorAppNet8.Components.MyNodes
 
@@ -23,11 +24,11 @@
 
 @code {
     private BlazorDiagram Diagram { get; set; } = null!;
-    private List<Department> Departments { get; set; } = new();
+    [Parameter]
+    public List<INode<IHierarchyItem>> hierarchyItems { get; set; } = new();
 
     protected override void OnInitialized()
     {
-        Departments = DepartmentGenerator.GenerateDepartments();
         InitializeDiagram();
     }
 
@@ -51,7 +52,7 @@
         Diagram.Nodes.Clear();
         Diagram.Links.Clear();
 
-        var rootNodes = Departments.Where(d => !d.ParentId.HasValue).ToList();
+        var rootNodes = hierarchyItems.Where(d => !d.ParentId.HasValue).ToList();
         foreach (var root in rootNodes)
         {
             AddNodeWithChildren(root);
@@ -60,23 +61,23 @@
         RecalculateNodePositions();
     }
 
-    private void AddNodeWithChildren(Department department)
+    private void AddNodeWithChildren(IHierarchyItem hierarchyItem)
     {
-        var node = Diagram.Nodes.OfType<DepartmentNode>().FirstOrDefault(n => n.Department.Id == department.Id);
+        var node = Diagram.Nodes.OfType<INode<IHierarchyItem>>().FirstOrDefault(n => n.Item.Id == hierarchyItem.Id);
         if (node == null)
         {
-            var position = NodePositionCalculator.CalculatePositions(Departments)[department.Id];
-            node = new DepartmentNode(position) { Department = department };
+            var position = NodePositionCalculator.CalculatePositions(hierarchyItems)[hierarchyItem.Id];
+            node = new INode<IHierarchyItem>(position) { Item = hierarchyItem };
             Diagram.Nodes.Add(node);
         }
 
         if (node.IsExpanded)
         {
-            var children = Departments.Where(d => d.ParentId == department.Id).ToList();
+            var children = hierarchyItems.Where(d => d.ParentId == hierarchyItem.Id).ToList();
             foreach (var child in children)
             {
                 AddNodeWithChildren(child);
-                AddLinkBetweenNodes(node, Diagram.Nodes.OfType<DepartmentNode>().First(n => n.Department.Id == child.Id));
+                AddLinkBetweenNodes(node, Diagram.Nodes.OfType<DepartmentNode>().First(n => n.Item.Id == child.Id));
             }
         }
 
@@ -95,19 +96,19 @@
         };
     }
 
-    private void ExpandNode(DepartmentNode node)
+    private void ExpandNode(INode<IHierarchyItem> node)
     {
-        var children = Departments.Where(d => d.ParentId == node.Department.Id).ToList();
+        var children = hierarchyItems.Where(d => d.ParentId == node.Item.Id).ToList();
         foreach (var child in children)
         {
             AddNodeWithChildren(child);
-            AddLinkBetweenNodes(node, Diagram.Nodes.OfType<DepartmentNode>().First(n => n.Department.Id == child.Id));
+            AddLinkBetweenNodes(node, Diagram.Nodes.OfType<DepartmentNode>().First(n => n.Item.Id == child.Id));
         }
     }
 
-    private void CollapseNode(DepartmentNode node)
+    private void CollapseNode(INode<IHierarchyItem> node)
     {
-        var childNodes = Diagram.Nodes.Where(n => n is DepartmentNode dn && dn.Department.ParentId == node.Department.Id).ToList();
+        var childNodes = Diagram.Nodes.Where(n => n is DepartmentNode dn && dn.Item.ParentId == node.Item.Id).ToList();
         foreach (var childNode in childNodes)
         {
             RemoveNodeAndLinks(childNode);
@@ -129,7 +130,7 @@
 
         if (node is DepartmentNode departmentNode)
         {
-            var grandChildNodes = Diagram.Nodes.Where(n => n is DepartmentNode dn && dn.Department.ParentId == departmentNode.Department.Id).ToList();
+            var grandChildNodes = Diagram.Nodes.Where(n => n is DepartmentNode dn && dn.Item.ParentId == departmentNode.Item.Id).ToList();
             foreach (var grandChildNode in grandChildNodes)
             {
                 RemoveNodeAndLinks(grandChildNode);
@@ -156,18 +157,25 @@
         // Diagram.Links.Add(new LinkModel(daSourceAnchor, someTargetAnchor));
 
 
-        var link = new LinkModel(sourceAnchor, targetAnchor) { Router = new OrthogonalRouter(), TargetMarker = LinkMarker.Arrow };
+        var link = new LinkModel(sourceAnchor, targetAnchor) { 
+            Router = new OrthogonalRouter(), 
+            TargetMarker = LinkMarker.Arrow 
+        };
         Diagram.Links.Add(link);
     }
 
     private void RecalculateNodePositions()
     {
-        var visibleNodes = Diagram.Nodes.OfType<DepartmentNode>().ToList();
-        var positions = NodePositionCalculator.CalculateVisiblePositions(visibleNodes);
+        var visibleNodes = Diagram.Nodes.OfType<INode<IHierarchyItem>>().ToList();
+        IHierarchyItem[] hierarchyItems = visibleNodes
+            .Select(node => node.Item)
+            .Cast<IHierarchyItem>()
+            .ToArray();
+        var positions = NodePositionCalculator.CalculatePositions(hierarchyItems);
 
         foreach (var node in visibleNodes)
         {
-            if (positions.TryGetValue(node.Department.Id, out var newPosition))
+            if (positions.TryGetValue(node.Item.Id, out var newPosition))
             {
                 node.SetPosition(newPosition.X, newPosition.Y);
             }
@@ -177,38 +185,38 @@
     }
 
     public void AddChildDepartment(int parentId)
-{
-    var newDepartment = new Department
     {
-        Id = Departments.Max(d => d.Id) + 1,
-        Name = $"Новое подразделение {Departments.Max(d => d.Id) + 1}",
-        ParentId = parentId
-    };
-
-    Departments.Add(newDepartment);
-    var parentNode = Diagram.Nodes.OfType<DepartmentNode>().FirstOrDefault(n => n.Department.Id == parentId);
-
-    if (parentNode != null)
-    {
-        if (!parentNode.IsExpanded)
+        var newDepartment = new Department
         {
-            parentNode.IsExpanded = true;
-            ExpandNode(parentNode);
+            Id = hierarchyItems.Max(d => d.Id) + 1,
+            Name = $"Новое подразделение {hierarchyItems.Max(d => d.Id) + 1}",
+            ParentId = parentId
+        };
+
+        hierarchyItems.Add(newDepartment);
+            var parentNode = Diagram.Nodes.OfType<DepartmentNode>().FirstOrDefault(n => n.Item.Id == parentId);
+
+        if (parentNode != null)
+        {
+            if (!parentNode.IsExpanded)
+            {
+                parentNode.IsExpanded = true;
+                ExpandNode(parentNode);
+            }
+            AddNodeWithChildren(newDepartment);
+                AddLinkBetweenNodes(parentNode, Diagram.Nodes.OfType<DepartmentNode>().First(n => n.Item.Id == newDepartment.Id));
+            RecalculateNodePositions();
         }
-        AddNodeWithChildren(newDepartment);
-        AddLinkBetweenNodes(parentNode, Diagram.Nodes.OfType<DepartmentNode>().First(n => n.Department.Id == newDepartment.Id));
-        RecalculateNodePositions();
     }
-}
 
-    public void DeleteDepartment(int departmentId)
+    public void DeleteDepartment(int nodeId)
     {
-        var departmentToRemove = Departments.FirstOrDefault(d => d.Id == departmentId);
-        var node = Diagram.Nodes.OfType<DepartmentNode>().FirstOrDefault(n => n.Department.Id == departmentId);
+        var nodeToRemove = hierarchyItems.FirstOrDefault(d => d.Id == nodeId);
+        var node = Diagram.Nodes.OfType<INode<IHierarchyItem>>().FirstOrDefault(n => n.Item.Id == nodeId);
 
-        if (departmentToRemove != null)
+        if (nodeToRemove != null)
         {
-            Departments.Remove(departmentToRemove);
+            hierarchyItems.Remove(nodeToRemove);
             RemoveNodeAndLinks(node);
         }
     }

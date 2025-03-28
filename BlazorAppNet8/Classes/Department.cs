@@ -1,12 +1,13 @@
 ﻿using BlazorAppNet8.Classes;
+using BlazorAppNet8.Components.MyNodes.Interfaces;
 
 namespace BlazorAppNet8.Classes
 {
-	public class Department
+	public class Department : IHierarchyItem
 	{
 		public int Id { get; set; }
 		public string Name { get; set; } = "";
-		public int? ParentId { get; set; }
+		public int? ParentId { get; set; } = null;
 	}
 }
 public class DepartmentGenerator
@@ -19,14 +20,12 @@ public class DepartmentGenerator
 		{
 			Id = 0,
 			Name = $"Корневое подразделение",
-			ParentId = null
 		});
 
 		departments.Add(new Department
 		{
 			Id = -1,
 			Name = $"Второе корневое подразделение",
-			ParentId = null
 		});
 
 		for (int i = 1; i <= 5; i++)
