@@ -23,10 +23,12 @@
 
 @code {
     private BlazorDiagram Diagram { get; set; } = null!;
+    //Убрать зависимость от реализации
     private List<Department> Departments { get; set; } = new();
 
     protected override void OnInitialized()
     {
+        //Убрать зависимость от реализации
         Departments = DepartmentGenerator.GenerateDepartments();
         InitializeDiagram();
     }
@@ -41,6 +43,7 @@
         };
 
         Diagram = new BlazorDiagram(options);
+        //Убрать зависимость от реализации
         Diagram.RegisterComponent<DepartmentNode, DepartmentWidget>();
 
         UpdateDiagram();
