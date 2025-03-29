@@ -204,12 +204,7 @@
     public void DeleteNode(NodeModel node)
     {
         var foundNode = Diagram.Nodes.OfType<NodeModel>().FirstOrDefault(n => n == node);
-
-        if (foundNode != null)
-        {
-            // Diagram.Nodes = Diagram.Nodes.Where(n => n != foundNode).ToList();
-            RemoveNodeAndLinks(foundNode);
-        }
+        if (foundNode != null) RemoveNodeAndLinks(foundNode);
     }
 
     public void DeleteDepartment(int depId) => Departments = Departments.Where(d => d.Id != depId).ToList();
