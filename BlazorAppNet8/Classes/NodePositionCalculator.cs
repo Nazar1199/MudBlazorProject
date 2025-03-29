@@ -1,10 +1,11 @@
 ﻿namespace BlazorAppNet8.Classes
 {
-	using System;
+	using Blazor.Diagrams.Core.Models;
 	using System.Collections.Generic;
 	using System.Linq;
 	using Blazor.Diagrams.Core.Geometry;
     using BlazorAppNet8.Components.MyNodes;
+    using BlazorAppNet8.Interfaces;
 
     public class NodePositionCalculator
 	{
@@ -73,9 +74,66 @@
 			}
 
 			return positions;
-		}
+        }
 
-		private static Dictionary<int, List<Department>> GroupNodesByLevel(List<Department> departments)
+        public static Dictionary<int, Point> CalculateVisiblePositions(List<IParentIdNode> visibleNodes)
+        {
+            var positions = new Dictionary<int, Point>();
+            var levels = GroupNodesByLevel(visibleNodes);
+
+            foreach (var level in levels)
+            {
+                int levelIndex = level.Key;
+                var nodesOnLevel = level.Value;
+
+                int nodeCount = nodesOnLevel.Count;
+                double totalWidth = nodeCount * HorizontalSpacing;
+
+                double startX = InitialX + (DiagramWidth - totalWidth) / 2;
+                double y = InitialY + levelIndex * VerticalSpacing;
+
+                for (int i = 0; i < nodeCount; i++)
+                {
+                    var node = nodesOnLevel[i];
+                    double x = startX + i * HorizontalSpacing;
+                    positions[node.Id] = new Point(x, y);
+                }
+            }
+
+            return positions;
+        }
+
+        private static Dictionary<int, List<IParentIdNode>> GroupNodesByLevel(List<IParentIdNode> nodes)
+        {
+            var levels = new Dictionary<int, List<IParentIdNode>>();
+
+            var rootNodes = nodes.Where(d => !d.ParentId.HasValue).ToList();
+            levels[0] = rootNodes;
+
+            int currentLevel = 0;
+            while (levels.ContainsKey(currentLevel))
+            {
+                var currentNodes = levels[currentLevel];
+                var nextLevelNodes = new List<IParentIdNode>();
+
+                foreach (var node in currentNodes)
+                {
+                    var children = nodes.Where(d => d.ParentId == node.Id).ToList();
+                    nextLevelNodes.AddRange(children);
+                }
+
+                if (nextLevelNodes.Any())
+                {
+                    levels[currentLevel + 1] = nextLevelNodes;
+                }
+
+                currentLevel++;
+            }
+
+            return levels;
+        }
+
+        private static Dictionary<int, List<Department>> GroupNodesByLevel(List<Department> departments)
 		{
 			var levels = new Dictionary<int, List<Department>>();
 

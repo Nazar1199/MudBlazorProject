@@ -10,6 +10,7 @@
 @using Blazor.Diagrams.Core.Geometry
 @using BlazorAppNet8.Classes
 @using BlazorAppNet8.Components.MyNodes
+@using BlazorAppNet8.Interfaces
 
 @namespace BlazorAppNet8.Components.MyNodes
 
@@ -163,12 +164,12 @@
     //Убрать зависимость от реализации
     private void RecalculateNodePositions()
     {
-        var visibleNodes = Diagram.Nodes.OfType<DepartmentNode>().ToList();
+        var visibleNodes = Diagram.Nodes.OfType<IParentIdNode>().ToList();
         var positions = NodePositionCalculator.CalculateVisiblePositions(visibleNodes);
 
         foreach (var node in visibleNodes)
         {
-            if (positions.TryGetValue(node.Department.Id, out var newPosition))
+            if (positions.TryGetValue(node.Id, out var newPosition))
             {
                 node.SetPosition(newPosition.X, newPosition.Y);
             }
