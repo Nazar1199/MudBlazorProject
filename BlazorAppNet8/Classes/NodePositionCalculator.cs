@@ -76,7 +76,7 @@
 			return positions;
         }
 
-        public static Dictionary<int, Point> CalculateVisiblePositions(List<IParentIdNode> visibleNodes)
+        public static Dictionary<int, Point> CalculateVisiblePositions(List<AbstractCustomNode<IParentIdNode>> visibleNodes)
         {
             var positions = new Dictionary<int, Point>();
             var levels = GroupNodesByLevel(visibleNodes);
@@ -96,29 +96,29 @@
                 {
                     var node = nodesOnLevel[i];
                     double x = startX + i * HorizontalSpacing;
-                    positions[node.Id] = new Point(x, y);
+                    positions[node.Data.Id] = new Point(x, y);
                 }
             }
 
             return positions;
         }
 
-        private static Dictionary<int, List<IParentIdNode>> GroupNodesByLevel(List<IParentIdNode> nodes)
+        private static Dictionary<int, List<AbstractCustomNode<IParentIdNode>>> GroupNodesByLevel(List<AbstractCustomNode<IParentIdNode>> nodes)
         {
-            var levels = new Dictionary<int, List<IParentIdNode>>();
+            var levels = new Dictionary<int, List<AbstractCustomNode<IParentIdNode>>>();
 
-            var rootNodes = nodes.Where(d => !d.ParentId.HasValue).ToList();
+            var rootNodes = nodes.Where(d => !d.Data.ParentId.HasValue).ToList();
             levels[0] = rootNodes;
 
             int currentLevel = 0;
             while (levels.ContainsKey(currentLevel))
             {
                 var currentNodes = levels[currentLevel];
-                var nextLevelNodes = new List<IParentIdNode>();
+                var nextLevelNodes = new List<AbstractCustomNode<IParentIdNode>>();
 
                 foreach (var node in currentNodes)
                 {
-                    var children = nodes.Where(d => d.ParentId == node.Id).ToList();
+                    var children = nodes.Where(d => d.Data.ParentId == node.Data.Id).ToList();
                     nextLevelNodes.AddRange(children);
                 }
 

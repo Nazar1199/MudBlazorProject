@@ -164,12 +164,12 @@
     //Убрать зависимость от реализации
     private void RecalculateNodePositions()
     {
-        var visibleNodes = Diagram.Nodes.OfType<IParentIdNode>().ToList();
+        var visibleNodes = Diagram.Nodes.OfType<AbstractCustomNode<IParentIdNode>>().ToList();
         var positions = NodePositionCalculator.CalculateVisiblePositions(visibleNodes);
 
         foreach (var node in visibleNodes)
         {
-            if (positions.TryGetValue(node.Id, out var newPosition))
+            if (positions.TryGetValue(node.Data.Id, out var newPosition))
             {
                 node.SetPosition(newPosition.X, newPosition.Y);
             }
