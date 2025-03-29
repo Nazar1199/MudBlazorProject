@@ -143,8 +143,10 @@
         var centerBottomPort = new BoundsBasedPositionProvider(0.5, 1);
         var centerRightPort = new BoundsBasedPositionProvider(1, 0.5);
         var centerLeftPort = new BoundsBasedPositionProvider(0, 0.5);
+
         var sourceAnchor = new DynamicAnchor(parentNode, new[] { centerTopPort, centerBottomPort });
         var targetAnchor = new DynamicAnchor(childNode, new[] { centerTopPort, centerBottomPort });
+        
         var link = new LinkModel(sourceAnchor, targetAnchor) { Router = new OrthogonalRouter(), TargetMarker = LinkMarker.Arrow };
         Diagram.Links.Add(link);
     }
