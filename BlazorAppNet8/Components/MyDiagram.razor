@@ -139,23 +139,12 @@
 
     private void AddLinkBetweenNodes(NodeModel parentNode, NodeModel childNode)
     {
-        var parentPort = parentNode.AddPort(PortAlignment.Bottom);
-        var childPort = childNode.AddPort(PortAlignment.Top);
-
-        var sourceAnchor = new DynamicAnchor(parentNode, new[]
-            {
-            new BoundsBasedPositionProvider(0.5, 0), // Center top
-            new BoundsBasedPositionProvider(0.5, 1), // Center bottom
-        });
-
-        var targetAnchor = new DynamicAnchor(childNode, new[]
-            {
-            new BoundsBasedPositionProvider(0.5, 0), // Center top
-            new BoundsBasedPositionProvider(0.5, 1), // Center bottom
-        });
-        // Diagram.Links.Add(new LinkModel(daSourceAnchor, someTargetAnchor));
-
-
+        var centerTopPort = new BoundsBasedPositionProvider(0.5, 0);
+        var centerBottomPort = new BoundsBasedPositionProvider(0.5, 1);
+        var centerRightPort = new BoundsBasedPositionProvider(1, 0.5);
+        var centerLeftPort = new BoundsBasedPositionProvider(0, 0.5);
+        var sourceAnchor = new DynamicAnchor(parentNode, new[] { centerTopPort, centerBottomPort });
+        var targetAnchor = new DynamicAnchor(childNode, new[] { centerTopPort, centerBottomPort });
         var link = new LinkModel(sourceAnchor, targetAnchor) { Router = new OrthogonalRouter(), TargetMarker = LinkMarker.Arrow };
         Diagram.Links.Add(link);
     }
