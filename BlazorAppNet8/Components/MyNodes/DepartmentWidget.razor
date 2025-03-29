@@ -30,12 +30,12 @@
 
     private void DeleteDepartment()
     {
-        ParentComponent.DeleteDepartment(Node.Department.Id);
+        ParentComponent.DeleteNode(Node);
     }
 
     private void AddChildDepartment()
     {
-        ParentComponent.AddChildDepartment(Node.Department.Id);
+        ParentComponent.AddChildNode(Node.Department.Id);
     }
 
     private void ToggleChildren()
