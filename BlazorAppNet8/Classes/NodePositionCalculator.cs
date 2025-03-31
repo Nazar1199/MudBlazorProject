@@ -9,17 +9,17 @@
 
     public class NodePositionCalculator
 	{
-		// Ширина между нодами
 		private const int HorizontalSpacing = 250;
 
-		// Высота между нодами
 		private const int VerticalSpacing = 250;
 
 		private const int InitialX = 50;
 
 		private const int InitialY = 50;
 
-		public static Dictionary<int, Point> CalculatePositions(List<Department> departments)
+        private const int DiagramWidth = 250;
+
+        public static Dictionary<int, Point> CalculatePositions(List<Department> departments)
 		{
 			var positions = new Dictionary<int, Point>();
 
@@ -48,33 +48,6 @@
 
 			return positions;
 		}
-
-		public static Dictionary<int, Point> CalculateVisiblePositions(List<DepartmentNode> visibleNodes)
-		{
-			var positions = new Dictionary<int, Point>();
-			var levels = GroupNodesByLevel(visibleNodes);
-
-			foreach (var level in levels)
-			{
-				int levelIndex = level.Key;
-				var nodesOnLevel = level.Value;
-
-				int nodeCount = nodesOnLevel.Count;
-				double totalWidth = nodeCount * HorizontalSpacing;
-
-				double startX = InitialX + (DiagramWidth - totalWidth) / 2;
-				double y = InitialY + levelIndex * VerticalSpacing;
-
-				for (int i = 0; i < nodeCount; i++)
-				{
-					var node = nodesOnLevel[i];
-					double x = startX + i * HorizontalSpacing;
-					positions[node.Department.Id] = new Point(x, y);
-				}
-			}
-
-			return positions;
-        }
 
         public static Dictionary<int, Point> CalculateVisiblePositions(List<AbstractCustomNode<IParentIdNode>> visibleNodes)
         {
@@ -192,7 +165,5 @@
 
 			return levels;
 		}
-
-		private const int DiagramWidth = 250;
 	}
 }
