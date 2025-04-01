@@ -1,8 +1,9 @@
-﻿using BlazorAppNet8.Classes;
+﻿using BlazorAppNet8.Interfaces;
+using BlazorAppNet8.Classes;
 
 namespace BlazorAppNet8.Classes
 {
-	public class Department
+	public class Department : IParentIdNode
 	{
 		public int Id { get; set; }
 		public string Name { get; set; } = "";

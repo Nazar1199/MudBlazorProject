@@ -5,7 +5,7 @@ namespace BlazorAppNet8.Interfaces
 {
     public abstract class AbstractCustomNode<T>(Point? position = null) : NodeModel(position), IExpandableNode where T : IParentIdNode
     {
-        public required T Data { get; set; }
+        public T Data { get; set; }
         public Action? OnToggleExpand { get; set; }
         public bool IsExpanded { get; set; }
     }
